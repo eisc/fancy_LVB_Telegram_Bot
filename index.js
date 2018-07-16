@@ -1,43 +1,46 @@
 'use strict'
 
+let config = require('./config');
+
 const Telegram = require('telegram-node-bot'),
-  tg = new Telegram.Telegram('TOKEN', {
+  tg = new Telegram.Telegram(config.TELEGRAM_TOKEN, {
     workers: 1
   });
 
 
-  class StartController extends Telegram.TelegramBaseController {
-    handle($){
-      $.sendMessage('This is the magic.');
-  }}
-  class VersionController extends Telegram.TelegramBaseController {
-    handle($){
-      $.sendChatAction('typing');
-      $.sendMessage('version 1.337');
-    }
+class StartController extends Telegram.TelegramBaseController {
+  handle($) {
+    $.sendMessage('This is the magic.');
   }
-  class PlanController extends Telegram.TelegramBaseController {
-    handle($){
-      $.sendChatAction('upload_photo');
-      $.sendPhoto('http://phototrans.de/images/schemas/original/71/914.jpg');
-      $.sendDocument({ path: '/home/eiscreme/lvb_bot/Netzplan_Tag.pdf'})
-    }
+}
+class VersionController extends Telegram.TelegramBaseController {
+  handle($) {
+    $.sendChatAction('typing');
+    $.sendMessage('version 1.337');
   }
-
-  class OtherwiseController extends Telegram.TelegramBaseController {
-    handle($){
-      $.sendChatAction('typing');
-      $.sendMessage('Sorry, try again.');
-    }
+}
+class PlanController extends Telegram.TelegramBaseController {
+  handle($) {
+    $.sendChatAction('upload_photo');
+    $.sendPhoto('http://phototrans.de/images/schemas/original/71/914.jpg');
+    $.sendDocument({ path: 'Netzplan_Tag.pdf' })
   }
+}
 
-  const ListController = require('./list');
-  const listCtrl = new ListController();
+class OtherwiseController extends Telegram.TelegramBaseController {
+  handle($) {
+    $.sendChatAction('typing');
+    $.sendMessage('Sorry, try again.');
+  }
+}
 
-  tg.router.when(new Telegram.TextCommand('/start'), new StartController())
-    .when(new Telegram.TextCommand('/version'), new VersionController())
-    .when(new Telegram.TextCommand('/plan'), new PlanController())
-    .when(new Telegram.TextCommand('/list', 'listCommand'), listCtrl)
-    .when(new Telegram.TextCommand('/add', 'addCommand'), listCtrl)
-    .when(new Telegram.TextCommand('/remove', 'removeCommand'), listCtrl)
-    .otherwise(new OtherwiseController());
+const ListController = require('./list');
+const listCtrl = new ListController();
+
+tg.router.when(new Telegram.TextCommand('/start'), new StartController())
+  .when(new Telegram.TextCommand('/version'), new VersionController())
+  .when(new Telegram.TextCommand('/plan'), new PlanController())
+  .when(new Telegram.TextCommand('/list', 'listCommand'), listCtrl)
+  .when(new Telegram.TextCommand('/add', 'addCommand'), listCtrl)
+  .when(new Telegram.TextCommand('/remove', 'removeCommand'), listCtrl)
+  .otherwise(new OtherwiseController());
