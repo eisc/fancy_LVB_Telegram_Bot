@@ -11,6 +11,6 @@
   "license": "ISC",
   "dependencies": {
     "lvb": "0.0.2",
-    "telegram-node-bot": "^4.0.5"
+    "node-telegram-bot-api": "^0.30.0"
   }
 }
