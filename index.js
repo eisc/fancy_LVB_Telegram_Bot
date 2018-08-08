@@ -7,21 +7,6 @@ const token = config.TELEGRAM_TOKEN
 const bot = new TelegramBot(token, {polling: true})
 
 let globalStations = []
-// Matches "/echo [whatever]"
-bot.onText(/\/echo (.+)/, (msg, match) => {
-  // 'msg' is the received Message from Telegram
-  // 'match' is the result of executing the regexp above on the text content
-  // of the message
-
-  const chatId = msg.chat.id
-  const resp = match[1] // the captured "whatever"
-
-  // send back the matched "whatever" to the chat
-  bot.sendMessage(chatId, resp)
-})
-
-// Listen for any kind of message. There are different kinds of
-// messages.
 
 bot.onText(/\/start/, (msg) => {
   bot.sendChatAction(msg.chat.id, 'typing')
@@ -37,31 +22,46 @@ bot.onText(/\/plan/, (msg) => {
 bot.onText(/\/add (.+)/, (msg, match) => {
   let parts = match[1]
   globalStations.push(parts)
-  bot.sendMessage(msg.chat.id, 'something', {
-    'reply_markup': {
-      'keyboard': [globalStations]
+  bot.sendMessage(msg.chat.id, `${parts} wurde hinzugefügt.`, {
+    reply_markup: {
+      keyboard: [globalStations]
     }
   }
   )
 })
 
-bot.onText(/\/reset (.*)/, (msg, match) => {
-  console.log(JSON.stringify(match));
-  let parts = match[1]
-  console.log('lhgerlk');
+bot.onText(/\/reset(\s*)(.*)/, (msg, match) => {
+  let parts = match[2]
+  let index = globalStations.indexOf(parts)
+  if (parts) {
+    if (index === -1) {
+      bot.sendMessage(msg.chat.id, `${parts} steht nicht auf der Liste`)
+      return
+    }
+    globalStations.splice(index, 1)
+    console.log(globalStations)
+    bot.sendMessage(msg.chat.id, `${parts} wurde gelöscht.`, {
+      reply_markup: {
+        keyboard: [globalStations]
+      }
+    })
+  } else {
+    bot.sendMessage(msg.chat.id, 'reset the whole list?', {
+      reply_markup: {
+        inline_keyboard: [ [ {text: 'yes', callback_data: 'reset'}, {text: 'no', callback_data: 'noreset'} ]
+        ],
+        one_time_keyboard: true
+      }
+    })
+  }
 })
 
-bot.onText(/\/reset/, (msg) => {
-  bot.sendMessage(msg.chat.id, 'something', {
-    'reply_markup': {
-      'remove_keyboard': true
-    }})
+bot.on('callback_query', query => {
+  if (query.data === 'reset') {
+    bot.sendMessage(query.message.chat.id, 'Liste gelöscht', {
+      reply_markup: {
+        remove_keyboard: true
+      }
+    })
+  }
 })
-//
-// class OtherwiseController extends Telegram.TelegramBaseController {
-//   handle ($) {
-//     $.sendChatAction('typing')
-//     $.sendMessage('Sorry, try again.')
-//   }
-// }
-//
