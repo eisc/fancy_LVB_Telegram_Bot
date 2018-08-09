@@ -2,8 +2,6 @@
 
 todo:
 
-- /reset (mit Wert)
-- /reset (ohne Wert) als inline keyboard mit Ja/Nein
 - /help
 - Fahrplandaten einfügen
 - Haltestelle per Eingabe anfragen (-> Ausgabe: nächsten Abfahrten an der Haltestelle)
