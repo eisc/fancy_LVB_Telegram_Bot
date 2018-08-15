@@ -1,0 +1,8 @@
+.separator ','
+.import calendar_dates.txt calendar_dates
+.import calendar.txt calendar
+.import routes.txt routes
+.import stop_times.txt stop_times
+.import stops.txt stops
+.import transfers.txt transfers
+.import trips.txt trips
