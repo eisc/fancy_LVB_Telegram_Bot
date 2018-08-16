@@ -9,7 +9,6 @@ const bot = new TelegramBot(token, {polling: true})
 let globalStations = []
 
 bot.onText(/\/start/, (msg) => {
-  bot.sendChatAction(msg.chat.id, 'typing')
   bot.sendMessage(msg.chat.id, 'Hallo ' + msg.from.first_name + '!\nIch helfe dir gerne bei den Abfahrtszeiten von Bussen und Bahnen der LVB.\nBei /help werden dir alle Funktionen dieses Bots aufgelistet.')
 })
 
@@ -19,8 +18,12 @@ bot.onText(/\/plan/, (msg) => {
   bot.sendDocument(msg.chat.id, '/home/eiscreme/fancy_LVB_Telegram_Bot/Netzplan_Tag.pdf')
 })
 
-bot.onText(/\/add (.+)/, (msg, match) => {
-  let parts = match[1]
+bot.onText(/\/add(\s*)(.*)/, (msg, match) => {
+  let parts = match[2]
+  if (parts === '') {
+    bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
+    return
+  }
   globalStations.push(parts)
   bot.sendMessage(msg.chat.id, `${parts} wurde hinzugefügt.`, {
     reply_markup: {
@@ -80,4 +83,44 @@ bot.onText(/\/reset(\s*)(.*)/, (msg, match) => {
       }
     })
   }
+})
+
+bot.onText(/\/location/, (msg) => {
+  bot.sendMessage(msg.chat.id, 'Bitte schick mir deinen Standort.', {
+    reply_markup: {
+      keyboard: [ [ {text: 'Standort senden', request_location: true}, {text: 'Nein, lieber nicht.'} ] ],
+      one_time_keyboard: true,
+      resize_keyboard: true
+      // Problem: Kurzwahlliste wird von diesem Keyboard überschrieben
+    }
+  })
+})
+bot.onText(/Nein, lieber nicht./, (msg) => {
+  bot.sendMessage(msg.chat.id, 'Ok, dann nicht. Du kannst mit /station auch direkt nach einer Haltestelle suchen.', {
+    reply_markup: {
+      remove_keyboard: true
+    }
+  })
+})
+bot.on('location', (msg) => {
+  console.log(msg.location)
+  let {latitude, longitude} = msg.location
+  bot.sendMessage(msg.chat.id, 'Danke.', {
+    reply_markup: {
+      remove_keyboard: true
+    }
+  })
+  // nächstgelegenen Haltestellen
+  // bot.sendVenue(msg.chat.id, latitude, longitude, 'Die nächsten Haltestellen sind hier:')
+})
+
+bot.onText(/\/station(\s*)(.*)/, (msg, match) => {
+  let station = match[2]
+  if (station === '') {
+    bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
+    return
+  }
+  // let lat = lat.station
+  // let lon = lon.station
+  bot.sendVenue(msg.chat.id, 51.325209, 12.400980, `${station}`, 'Linien:')
 })
