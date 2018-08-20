@@ -10,8 +10,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "better-sqlite3": "^4.1.4",
     "lvb": "0.0.2",
-    "node-telegram-bot-api": "^0.30.0",
-    "sqlite3": "^4.0.2"
+    "node-telegram-bot-api": "^0.30.0"
   }
 }
