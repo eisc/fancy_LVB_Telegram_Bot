@@ -10,7 +10,10 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "lodash": "^4.17.11",
+    "lodash.isobject": "^3.0.2",
     "lvb": "0.0.2",
+    "moment": "^2.22.2",
     "node-telegram-bot-api": "^0.30.0"
   }
 }
