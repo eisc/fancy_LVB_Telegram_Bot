@@ -8,7 +8,7 @@ let config = require('./config')
 const token = config.TELEGRAM_TOKEN
 
 // Create a bot that uses 'polling' to fetch new updates
-const bot = new TelegramBot(token, {polling: true})
+const bot = new TelegramBot(token, { polling: true })
 
 let jmap = require('./maps.json')
 
@@ -25,7 +25,7 @@ bot.onText(/\/help/, (msg) => {
 bot.onText(/\/plan(\s*)(.*)/, (msg, match) => {
   bot.sendMessage(msg.chat.id, 'Welchen Netzplan möchtest du haben?', {
     reply_markup: {
-      inline_keyboard: [ [ {text: 'Gesamtnetz Leipzig', callback_data: '0'}, {text: 'Liniennetz Nacht', callback_data: '1'} ], [ {text: 'Stadtplan Leipzig', callback_data: '2'}, {text: 'Tarifzonenplan MDV', callback_data: '3'} ]
+      inline_keyboard: [ [ { text: 'Gesamtnetz Leipzig', callback_data: '0' }, { text: 'Liniennetz Nacht', callback_data: '1' } ], [ { text: 'Stadtplan Leipzig', callback_data: '2' }, { text: 'Tarifzonenplan MDV', callback_data: '3' } ]
       ]
     }
   })
@@ -44,28 +44,30 @@ bot.onText(/\/add(\s*)(.*)/, (msg, match) => {
     bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
     return
   }
+  if (globalStations.includes(match[2])) {
+    bot.sendMessage(msg.chat.id, `${match[2]} steht bereits auf der Liste.`)
+    return
+  }
   globalStations.push(match[2])
   bot.sendMessage(msg.chat.id, `${match[2]} wurde hinzugefügt.`, {
     reply_markup: {
       keyboard: [globalStations],
       resize_keyboard: true
     }
-  }
-  )
+  })
 })
 
 bot.onText(/\/reset(\s*)(.*)/, (msg, match) => {
-  let index = globalStations.indexOf(match[2])
   if (globalStations.length === 0) {
     bot.sendMessage(msg.chat.id, 'Liste ist bereits leer.')
     return
   }
   if (match[2]) {
-    if (index === -1) {
+    if (globalStations.indexOf(match[2]) === -1) {
       bot.sendMessage(msg.chat.id, `${match[2]} steht nicht auf der Liste`)
       return
     }
-    globalStations.splice(index, 1)
+    globalStations.splice(globalStations.indexOf(match[2]), 1)
     if (globalStations.length === 0) {
       bot.sendMessage(msg.chat.id, `${match[2]} wurde gelöscht.`, {
         reply_markup: {
@@ -83,13 +85,17 @@ bot.onText(/\/reset(\s*)(.*)/, (msg, match) => {
   } else {
     bot.sendMessage(msg.chat.id, 'gesamte Liste löschen?', {
       reply_markup: {
-        inline_keyboard: [ [ {text: 'JA  \u{1F44D}', callback_data: 'reset'}, {text: 'NEIN  \u{1F631}', callback_data: 'noreset'} ]
+        inline_keyboard: [ [ { text: 'JA  \u{1F44D}', callback_data: 'reset' }, { text: 'NEIN  \u{1F631}', callback_data: 'noreset' } ]
         ]
       }
     })
     bot.on('callback_query', query => {
       if (query.data === 'reset') {
         bot.answerCallbackQuery(query.id)
+        if (globalStations.length === 0) {
+          bot.sendMessage(msg.chat.id, 'Liste ist bereits leer.')
+          return
+        }
         globalStations.length = 0
         bot.sendMessage(query.message.chat.id, 'Liste wurde gelöscht', {
           reply_markup: {
@@ -98,48 +104,26 @@ bot.onText(/\/reset(\s*)(.*)/, (msg, match) => {
         })
       } else {
         bot.answerCallbackQuery(query.id)
-        bot.sendMessage(query.message.chat.id, 'Abbruch')
+        bot.sendMessage(query.message.chat.id, 'Ok, dann nicht.')
       }
     }
     )
   }
 })
 
-bot.onText(/\/onlocation/, (msg) => {
-  bot.sendMessage(msg.chat.id, 'Bitte schick mir deinen Standort.', {
-    reply_markup: {
-      keyboard: [ [ {text: 'Standort senden', request_location: true}, {text: 'Nein, lieber nicht.'} ] ],
-      one_time_keyboard: true,
-      resize_keyboard: true
-      // Problem: Kurzwahlliste wird von diesem Keyboard überschrieben
-    }
-  })
-})
-bot.onText(/Nein, lieber nicht./, (msg) => {
-  bot.sendMessage(msg.chat.id, 'Ok, dann nicht. Du kannst mit /station auch direkt nach einer Haltestelle suchen.', {
-    reply_markup: {
-      remove_keyboard: true
-    }
-  })
-})
 bot.on('location', (msg) => {
   console.log(msg.location)
-  let {latitude, longitude} = msg.location
-  bot.sendMessage(msg.chat.id, 'Danke.', {
+  let { latitude, longitude } = msg.location
+  bot.sendMessage(msg.chat.id, 'Danke. Das sind die nächsten 5 Haltestellen:', {
     reply_markup: {
-      remove_keyboard: true
-    }
-  })
-  bot.sendMessage(msg.chat.id, 'Das sind die nächsten 5 Haltestellen:', {
-    reply_markup: {
-      inline_keyboard: [ [ {text: 'Haltestelle 1', callback_data: 'Haltestelle 1'}, {text: 'Haltestelle 2', callback_data: 'Haltestelle 2'} ]
+      inline_keyboard: [ [ { text: `name`, callback_data: 'db[station.id]}' }, { text: 'Haltestelle 2', callback_data: 'Haltestelle 2' } ]
       ]
     }
   })
   bot.on('callback_query', query => {
-    if (query.data === 'Haltestelle 1') {
+    if (query.data === 'db[station.id]') {
       bot.answerCallbackQuery(query.id)
-      bot.sendVenue(msg.chat.id, 51.325209, 12.400980, `$(query.data) ist hier:`)
+      bot.sendMessage(msg.chat.id, `Das sind die nächsten 10 Abfahrten:`)
     }
   })
 })
