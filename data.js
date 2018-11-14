@@ -1,6 +1,5 @@
 var Database = require('better-sqlite3');
-var sortBy = require('lodash/sortBy');
-var db = new Database('lvb.db');
+var db = new Database('./data/lvb.db');
 
 // find all stations with substring in name
 // getStationsByName('Lütz', 5);
@@ -12,11 +11,15 @@ function getStationsByName(_name, _maxResults) {
     if (_maxResults > 0) {
         sql += 'limit ' + _maxResults
     }
-
-    let stmt = db.prepare(sql).all()
-
-    console.dir(stmt);
-    return stmt;
+    console.log("SQL: ", sql);
+    try {
+        let stmt = db.prepare(sql).all()
+        console.dir(stmt);
+        return stmt;
+    } catch(error) {
+        console.log(error);
+        return [];
+    }
 }
 
 // get arrivals by stop_id
@@ -30,11 +33,16 @@ function getArrivalsByStopId(_stopId, _maxResults) {
     if (_maxResults > 0) {
         sql += 'limit ' + _maxResults
     }
+    console.log("SQL: ", sql);
 
-    let stmt = db.prepare(sql).all()
-
-    console.dir(stmt);
-    return stmt;
+    try {    
+        let stmt = db.prepare(sql).all()
+        console.dir(stmt);
+        return stmt;
+    } catch(error) {
+        console.log(error);
+        return [];
+    }
 }
 
 // get the N closest stations next to your position
@@ -49,4 +57,10 @@ function getClosestStations(_lat, _lon, _count) {
 
     let sortedByDistance = sortBy(stmt, ['distance'])
     return sortedByDistance.slice(0,_count);
+}
+
+module.exports = {
+    getStationsByName: getStationsByName,
+    getArrivalsByStopId: getArrivalsByStopId,
+    getClosestStations: getClosestStations
 }
