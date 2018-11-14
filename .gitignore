@@ -1,4 +1,7 @@
 node_modules/
 config.js
+ftp_settings.cfg
 *.txt
 *.db
+*.zip
+*.html
