@@ -1,8 +1,10 @@
-process.env["NTBA_FIX_319"] = 1;
-const TelegramBot = require('node-telegram-bot-api');
-const moment = require('moment');
-const stations = require('lvb').stations;
-const departures = require('lvb').departures;
+process.env['NTBA_FIX_319'] = 1
+const TelegramBot = require('node-telegram-bot-api')
+const fetch = require('node-fetch')
+const moment = require('moment')
+const cache = require('node-cache')
+const stations = require('lvb').stations
+const departures = require('lvb').departures
 
 let config = require('./config')
 const token = config.TELEGRAM_TOKEN
@@ -44,15 +46,50 @@ bot.onText(/\/add(\s*)(.*)/, (msg, match) => {
     bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
     return
   }
-  if (globalStations.includes(match[2])) {
-    bot.sendMessage(msg.chat.id, `${match[2]} steht bereits auf der Liste.`)
-    return
-  }
-  globalStations.push(match[2])
-  bot.sendMessage(msg.chat.id, `${match[2]} wurde hinzugefügt.`, {
-    reply_markup: {
-      keyboard: [globalStations],
-      resize_keyboard: true
+  fetch('https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops').then(
+    result => { return result.json() }
+  ).then(data => {
+    return Promise.resolve(data.filter(stop => stop.name.toLowerCase().includes(match[2].toLowerCase())))
+  }).then(stations => {
+    const stationNames = stations.map(station => { return [{ text: station.name, callback_data: station.id }] })
+    if (stationNames.length >= 11) {
+      bot.sendMessage(msg.chat.id, 'Es gibt zu viele Treffer, bitte gib was genaueres ein.')
+    } else if (stationNames.length === 1) {
+      if (globalStations.includes(stations[0].name)) {
+        bot.sendMessage(msg.chat.id, `${stations[0].name} steht bereits auf der Liste.`)
+      } else {
+        globalStations.push(stations[0].name)
+        bot.sendMessage(msg.chat.id, `${stations[0].name} wurde hinzugefügt.`, {
+          reply_markup: {
+            keyboard: [globalStations],
+            resize_keyboard: true
+          }
+        })
+      }
+    } else if (stationNames.length === 0) {
+      bot.sendMessage(msg.chat.id, `${match[2]} ist keine Haltestelle.`)
+    } else {
+      bot.sendMessage(msg.chat.id, `Meintest du eine dieser ${stationNames.length} Haltestellen?`, {
+        reply_markup: {
+          inline_keyboard: stationNames
+        }
+      })
+      bot.on('callback_query', query => {
+        const station = stations.find(station => station.id === query.data)
+        bot.answerCallbackQuery(query.id)
+        if (globalStations.includes(station.name)) {
+          bot.sendMessage(msg.chat.id, `${station.name} steht bereits auf der Liste.`)
+        } else {
+          globalStations.push(station.name)
+          bot.sendMessage(msg.chat.id, `${station.name} wurde hinzugefügt.`, {
+            reply_markup: {
+              keyboard: [globalStations],
+              resize_keyboard: true
+            }
+          })
+        }
+      }
+      )
     }
   })
 })
@@ -63,25 +100,54 @@ bot.onText(/\/reset(\s*)(.*)/, (msg, match) => {
     return
   }
   if (match[2]) {
-    if (globalStations.indexOf(match[2]) === -1) {
-      bot.sendMessage(msg.chat.id, `${match[2]} steht nicht auf der Liste`)
-      return
+    const filteredStations = globalStations.filter(entry => entry.toLowerCase().includes(match[2].toLowerCase()))
+    switch (filteredStations.length) {
+      case 0:
+        bot.sendMessage(msg.chat.id, `${match[2]} steht nicht auf der Liste.`)
+        break
+      case 1:
+        globalStations.length === 1
+          ? bot.sendMessage(msg.chat.id, `${filteredStations[0]} wurde gelöscht.`, {
+            reply_markup: {
+              remove_keyboard: true
+            }
+          })
+          : globalStations.splice(globalStations.indexOf(filteredStations[0]), 1)
+        bot.sendMessage(msg.chat.id, `${filteredStations[0]} wurde gelöscht.`, {
+          reply_markup: {
+            keyboard: [globalStations],
+            resize_keyboard: true
+          }
+        })
+        break
+      default:
+        fetch('https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops').then(
+          result => { return result.json() }
+        ).then(data => {
+          return Promise.resolve(data.filter(stop => stop.name.toLowerCase().includes(match[2].toLowerCase())))
+        }).then(stations => {
+          const stationNames = stations.map(station => { return [{ text: station.name, callback_data: station.id }] })
+          if (stationNames.length >= 11) {
+            bot.sendMessage(msg.chat.id, 'Es gibt zu viele Treffer, bitte gib was genaueres ein.')
+          } else {
+            bot.sendMessage(msg.chat.id, `Es gibt ${stationNames.length} zur Auswahl:`, {
+              reply_markup: {
+                inline_keyboard: stationNames
+              }
+            })
+            bot.on('callback_query', query => {
+              const station = stations.find(station => station.id === query.data)
+              globalStations.splice(globalStations.indexOf(station.name), 1)
+              bot.sendMessage(msg.chat.id, `${station.name} wurde gelöscht.`, {
+                reply_markup: {
+                  keyboard: [globalStations],
+                  resize_keyboard: true
+                }
+              })
+            })
+          }
+        })
     }
-    globalStations.splice(globalStations.indexOf(match[2]), 1)
-    if (globalStations.length === 0) {
-      bot.sendMessage(msg.chat.id, `${match[2]} wurde gelöscht.`, {
-        reply_markup: {
-          remove_keyboard: true
-        }
-      })
-      return
-    }
-    bot.sendMessage(msg.chat.id, `${match[2]} wurde gelöscht.`, {
-      reply_markup: {
-        keyboard: [globalStations],
-        resize_keyboard: true
-      }
-    })
   } else {
     bot.sendMessage(msg.chat.id, 'gesamte Liste löschen?', {
       reply_markup: {
@@ -131,20 +197,42 @@ bot.on('location', (msg) => {
 bot.onText(/\/station(\s*)(.*)/, (msg, match) => {
   if (match[2] === '') {
     bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
-    return
+  } else {
+    fetch('https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops').then(
+      result => { return result.json() }
+    ).then(data => {
+      return Promise.resolve(data.filter(stop => stop.name.toLowerCase().includes(match[2].toLowerCase())))
+    }).then(stations => {
+      const stationNames = stations.map(station => { return [{ text: station.name, callback_data: station.id }] })
+      console.log(stationNames, stationNames.length === 1)
+      if (stationNames.length >= 11) {
+        bot.sendMessage(msg.chat.id, 'Es gibt zu viele Treffer, bitte gib was genaueres ein.')
+      } else if (stationNames.length === 1) {
+        bot.sendMessage(msg.chat.id, `Das sind die nächsten 10 Abfahrten für ${stations[0].name}:`)
+      } else {
+        bot.sendMessage(msg.chat.id, `Es gibt ${stationNames.length} zur Auswahl:`, {
+          reply_markup: {
+            inline_keyboard: stationNames
+          }
+        })
+        bot.on('callback_query', query => {
+          const station = stations.find(station => station.id === query.data)
+          bot.answerCallbackQuery(query.id)
+          bot.sendMessage(msg.chat.id, `Das sind die nächsten 10 Abfahrten für ${station.name}:`)
+        })
+      }
+    })
   }
-  // let lat = lat.station
-  // let lon = lon.station
-  bot.sendVenue(msg.chat.id, 51.325209, 12.400980, `${match[2]}`, 'Linien:')
 })
+
 bot.onText(/\/departure(\s*)(.*)/, (msg, match) => {
   if (match[2] === '') {
     bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
     return
   }
-  const stopName = match[2];
+  const stopName = match[2]
   stations(stopName).then(stations => {
-    if(stations.length) {
+    if (stations.length) {
       stations.forEach(station => handleStation(msg, station))
     } else {
       bot.sendMessage(msg.chat.id, 'Keine Station gefunden für ' + stopName)
@@ -154,30 +242,30 @@ bot.onText(/\/departure(\s*)(.*)/, (msg, match) => {
   })
 })
 
-function handleDeparture(msg, station, departureResults) {
-  if(departureResults.length) {
+function handleDeparture (msg, station, departureResults) {
+  if (departureResults.length) {
     departureResults.forEach(res => {
-      if(res.line) {
-        var answer = `Abfahrt ab ${station.name} von ${res.line.name} in Richtung ${res.line.direction}`;
-        if(res.timetable) {
-          answer += '\n';
+      if (res.line) {
+        var answer = `Abfahrt ab ${station.name} von ${res.line.name} in Richtung ${res.line.direction}`
+        if (res.timetable) {
+          answer += '\n'
           res.timetable.forEach(time => {
-            answer += handleDepartureTime(time);
+            answer += handleDepartureTime(time)
           })
         } else {
-          answer += '- Keine Abfahrtszeiten verfügbar für ' + station.name;
+          answer += '- Keine Abfahrtszeiten verfügbar für ' + station.name
         }
-        bot.sendMessage(msg.chat.id, answer);
+        bot.sendMessage(msg.chat.id, answer)
       } else {
-        bot.sendMessage(msg.chat.id, 'Keine Linieninformationen verfügbar');
+        bot.sendMessage(msg.chat.id, 'Keine Linieninformationen verfügbar')
       }
     })
   } else {
-    bot.sendMessage(msg.chat.id, 'Keine aktuellen Abfahrten gefunden für ' + station.name);
+    bot.sendMessage(msg.chat.id, 'Keine aktuellen Abfahrten gefunden für ' + station.name)
   }
 }
 
-function handleStation(msg, station) {
+function handleStation (msg, station) {
   departures(station.id, new Date()).then(
     departure => handleDeparture(msg, station, departure)
   ).catch(error => {
@@ -185,15 +273,19 @@ function handleStation(msg, station) {
   })
 }
 
-function handleDepartureTime(time) {
-  const depTime = new Date(Date.parse(time.departure));
-  const departureStr = moment(depTime).format('HH:mm:ss');
-  var answer = `- um ${departureStr}`;
-  if(time.departureDelay != 0) {
-    const delay = new Date(time.departureDelay);
-    const delayStr = moment(delay).format('mm:ss');
-    answer += ` mit einer Verspätung von ${delayStr} Minuten`;
+function handleDepartureTime (time) {
+  const depTime = new Date(Date.parse(time.departure))
+  const departureStr = moment(depTime).format('HH:mm:ss')
+  var answer = `- um ${departureStr}`
+  if (time.departureDelay !== 0) {
+    const delay = new Date(time.departureDelay)
+    const delayStr = moment(delay).format('mm:ss')
+    answer += ` mit einer Verspätung von ${delayStr} Minuten`
   }
-  answer += '\n';
-  return answer;
+  answer += '\n'
+  return answer
 }
+
+// fetch(`https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops/${stopid}/stoptimes`).then(
+//   result => {return result.json()}
+// ).then(console.log)
