@@ -1,12 +1,12 @@
 process.env['NTBA_FIX_319'] = 1
 
 const { handleCommandStart, handleCommandHelp } = require('./handler/general')
-const handleCommandPlan = require('./handler/plan').handleCommandPlan
-const handleCommandAdd = require('./handler/stationadd').handleCommandAdd
-const handleCommandReset = require('./handler/reset').handleCommandReset
-const handleCommandLocation = require('./handler/location').handleCommandLocation
-const handleCommandStation = require('./handler/station').handleCommandStation
-const handleCommandDeparture = require('./handler/departure').handleCommandDeparture
+const { handleCommandPlan } = require('./handler/plan')
+const { handleCommandAdd } = require('./handler/stationadd')
+const { handleCommandReset } = require('./handler/reset')
+const { handleCommandLocation } = require('./handler/location')
+const { handleCommandStation } = require('./handler/station')
+const { handleCommandDeparture } = require('./handler/departure')
 
 const bot = require('./helper/bot').createBot()
 

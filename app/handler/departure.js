@@ -1,6 +1,5 @@
 const moment = require('moment')
-const stations = require('lvb').stations
-const departures = require('lvb').departures
+const { stations, departures } = require('lvb')
 
 exports.handleCommandDeparture = function (bot, msg, match) {
     if (match[2] === '') {

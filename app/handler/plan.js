@@ -1,7 +1,12 @@
 let jmap = require('../../config/maps.json')
 
 exports.handleCommandPlan = function (bot, msg) {
-    bot.sendMessage(msg.chat.id, 'Welchen Netzplan möchtest du haben?', {
+    bot.sendMessage(msg.chat.id, 'Welchen Netzplan möchtest du haben?', getPlanSelection())
+    bot.on('callback_query', query => handlePlanSelection(bot, msg, query))
+}
+
+function getPlanSelection() {
+    return {
         reply_markup: {
             inline_keyboard: [
                 [
@@ -14,13 +19,18 @@ exports.handleCommandPlan = function (bot, msg) {
                 ]
             ]
         }
-    })
-    bot.on('callback_query', query => {
-        bot.answerCallbackQuery(query.id)
-        bot.sendChatAction(msg.chat.id, 'upload_document')
-        bot.sendDocument(msg.chat.id, jmap[query.data].path, {
-            caption: `*${jmap[query.data].title}*\n${jmap[query.data].description}`,
-            parse_mode: 'Markdown'
-        })
-    })
+    }
+}
+
+function handlePlanSelection(bot, msg, query) {
+    bot.answerCallbackQuery(query.id)
+    bot.sendChatAction(msg.chat.id, 'upload_document')
+    bot.sendDocument(msg.chat.id, jmap[query.data].path, getPlanAsDocument(query))
+}
+
+function getPlanAsDocument(query) {
+    return {
+        caption: `*${jmap[query.data].title}*\n${jmap[query.data].description}`,
+        parse_mode: 'Markdown'
+    }
 }
