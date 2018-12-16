@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "start": "node ./index.js",
-    "test": "mocha \"./test/**/*.js\""
+    "test": "mocha \"./test/**/*.js\"",
+    "test-with-coverage": "nyc --reporter=lcov --check-coverage --lines 70 --per-file mocha \"./test/**/*.js\""
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,7 @@
   },
   "devDependencies": {
     "chai": "^4.2.0",
-    "mocha": "^5.2.0"
+    "mocha": "^5.2.0",
+    "nyc": "^13.1.0"
   }
 }
