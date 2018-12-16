@@ -1,25 +1,33 @@
 const moment = require('moment')
-const { stations, departures } = require('lvb')
+const { departures, stations } = require('lvb')
 
-exports.handleCommandDeparture = function (bot, msg, match) {
-    if (match[2] === '') {
-        bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
-        return
-    }
-    const stopName = match[2]
+exports.getDeparturesForStation = function (bot, msg, station) {
+    mapStation(bot, msg, station, getDeparturesForMappedStation)
+}
+
+// station.id from GTFS != station.id from lvb library, so we need to map it here
+function getDeparturesForMappedStation (bot, msg, station) {
+    departures(station.id, new Date()).then(
+        departure => handleDeparture(bot, msg, station, departure)
+    ).catch(error => {
+        bot.sendMessage(msg.chat.id, 'Fehler ' + error)
+    })
+}
+
+function mapStation(bot, msg, station, func) {
     try {
-        stations(stopName).then(stations => {
+        stations(station.name).then(stations => {
             if (stations.length) {
-                stations.forEach(station => handleStation(bot, msg, station))
+                func(bot, msg, stations[0])
             } else {
-                bot.sendMessage(msg.chat.id, 'Keine Station gefunden für ' + stopName)
+                bot.sendMessage(msg.chat.id, 'Keine Station gefunden für ' + station.name)
             }
         }).catch(error => {
             bot.sendMessage(msg.chat.id, 'Fehler ' + error)
         })
     } catch(error) {
-        console.log(error)
-    }
+        bot.sendMessage(msg.chat.id, 'Fehler ' + error)
+    }    
 }
 
 function handleDeparture(bot, msg, station, departureResults) {
@@ -45,14 +53,6 @@ function handleDeparture(bot, msg, station, departureResults) {
     }
 }
 
-function handleStation(bot, msg, station) {
-    departures(station.id, new Date()).then(
-        departure => handleDeparture(bot, msg, station, departure)
-    ).catch(error => {
-        bot.sendMessage(msg.chat.id, 'Fehler ' + error)
-    })
-}
-
 function handleDepartureTime(time) {
     const depTime = new Date(Date.parse(time.departure))
     const departureStr = moment(depTime).format('HH:mm:ss')
@@ -65,7 +65,3 @@ function handleDepartureTime(time) {
     answer += '\n'
     return answer
 }
-
-// fetch(`https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops/${stopid}/stoptimes`).then(
-//   result => {return result.json()}
-// ).then(console.log)
