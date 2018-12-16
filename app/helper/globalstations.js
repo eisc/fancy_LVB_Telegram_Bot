@@ -5,11 +5,15 @@ exports.getGlobalStations = function () {
 }
 
 exports.addGlobalStation = function (name) {
-    globalStations.push(name)
+    if(globalStations.indexOf(name) === -1) {
+        globalStations.push(name)
+    }
 }
 
 exports.removeFromGlobalStation = function(station) {
-    globalStations.splice(globalStations.indexOf(station), 1)
+    if(globalStations.indexOf(station) !== -1) {
+        globalStations.splice(globalStations.indexOf(station), 1)
+    }
 }
 
 exports.deleteGlobalStations = function () {
