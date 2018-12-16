@@ -2,11 +2,7 @@ const moment = require('moment')
 const { departures, stations } = require('lvb')
 
 exports.getDeparturesForStation = function (bot, msg, station) {
-    mapStation(bot, msg, station, getDeparturesForMappedStation)
-}
-
-// station.id from GTFS != station.id from lvb library, so we need to map it here
-function getDeparturesForMappedStation (bot, msg, station) {
+    normalizeStationId(station)
     departures(station.id, new Date()).then(
         departure => handleDeparture(bot, msg, station, departure)
     ).catch(error => {
@@ -14,20 +10,8 @@ function getDeparturesForMappedStation (bot, msg, station) {
     })
 }
 
-function mapStation(bot, msg, station, func) {
-    try {
-        stations(station.name).then(stations => {
-            if (stations.length) {
-                func(bot, msg, stations[0])
-            } else {
-                bot.sendMessage(msg.chat.id, 'Keine Station gefunden für ' + station.name)
-            }
-        }).catch(error => {
-            bot.sendMessage(msg.chat.id, 'Fehler ' + error)
-        })
-    } catch(error) {
-        bot.sendMessage(msg.chat.id, 'Fehler ' + error)
-    }    
+function normalizeStationId(station) {
+    station.id = station.id.substring(4)
 }
 
 function handleDeparture(bot, msg, station, departureResults) {
