@@ -1,5 +1,5 @@
-var expect = require('chai').expect;
-var { 
+const expect = require('chai').expect;
+const { 
     getGlobalStations, 
     addGlobalStation,
     removeFromGlobalStation, 

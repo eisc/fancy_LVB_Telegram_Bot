@@ -1,5 +1,5 @@
 const moment = require('moment')
-const { departures, stations } = require('lvb')
+const { departures } = require('lvb')
 
 exports.getDeparturesForStation = function (bot, msg, station) {
     normalizeStationId(station)
@@ -17,24 +17,27 @@ function normalizeStationId(station) {
 function handleDeparture(bot, msg, station, departureResults) {
     if (departureResults.length) {
         departureResults.forEach(res => {
-            if (res.line) {
-                var answer = `Abfahrt ab ${station.name} von ${res.line.name} in Richtung ${res.line.direction}`
-                if (res.timetable) {
-                    answer += '\n'
-                    res.timetable.forEach(time => {
-                        answer += handleDepartureTime(time)
-                    })
-                } else {
-                    answer += '- Keine Abfahrtszeiten verfügbar für ' + station.name
-                }
-                bot.sendMessage(msg.chat.id, answer)
-            } else {
-                bot.sendMessage(msg.chat.id, 'Keine Linieninformationen verfügbar')
-            }
+            const answer = createAnswerForDepartureResult(station, res);
+            bot.sendMessage(msg.chat.id, answer)
         })
     } else {
         bot.sendMessage(msg.chat.id, 'Keine aktuellen Abfahrten gefunden für ' + station.name)
     }
+}
+
+function createAnswerForDepartureResult(station, res) {
+    if (res.line) {
+        var answer = `Abfahrt ab ${station.name} von ${res.line.name} in Richtung ${res.line.direction}\n`
+        if (res.timetable) {
+            res.timetable.forEach(time => {
+                answer += handleDepartureTime(time)
+            })
+        } else {
+            answer += '- Keine Abfahrtszeiten verfügbar'
+        }
+        return answer
+    }
+    return 'Keine Linieninformationen verfügbar'
 }
 
 function handleDepartureTime(time) {

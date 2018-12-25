@@ -1,6 +1,6 @@
-var expect = require('chai').expect;
-var sinon = require('sinon');
-var { handleCommandStart, handleCommandHelp } = require('../../../app/handler/general');
+const expect = require('chai').expect;
+const sinon = require('sinon');
+const { handleCommandStart, handleCommandHelp } = require('../../../app/handler/general');
 
 describe('test handleCommandStart and handleCommandHelp', () => {
     var bot = null;

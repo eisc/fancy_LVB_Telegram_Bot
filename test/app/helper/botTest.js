@@ -1,5 +1,5 @@
-var expect = require('chai').expect;
-var { createBot } = require('../../../app/helper/bot');
+const expect = require('chai').expect;
+const { createBot } = require('../../../app/helper/bot');
 const { TELEGRAM_TOKEN } = require('../../../config/config')
 
 describe('test createBot', () => {
