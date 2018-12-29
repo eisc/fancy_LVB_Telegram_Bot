@@ -3,28 +3,27 @@
     "title": "Liniennetz Leipzig",
     "description": "Gesamtnetz des Leipziger Nahverkehrs",
     "thumb": "https://cdn.glitch.com/daed98bf-70d1-4654-899f-c13129400cff%2FvRDcS6jm.jpeg?1531015704270",
-    "path": "/home/eiscreme/fancy_LVB_Telegram_Bot/Netzplan_Tag.pdf"
+    "path": "/usr/src/app/public/maps/Netzplan_Tag.pdf"
   },
 
   {
     "title": "Liniennetz Leipzig Nacht",
     "description": "Treffen aller Linien täglich um 01:11, 02:22, 03:33 Uhr am Hauptbahnhof\nSamstag, Sonn- und Feiertag zusätzlich 01:45, 03:00 Uhr",
     "thumb": "https://cdn.glitch.com/daed98bf-70d1-4654-899f-c13129400cff%2FScreen%20Shot%202018-07-07%20at%2010.16.00%20PM.png?1531016281851",
-    "path": "/home/eiscreme/fancy_LVB_Telegram_Bot/Netzplan_Nacht.pdf"
+    "path": "/usr/src/app/public/maps/Netzplan_Nacht.pdf"
   },
 
   {
     "title": "Stadtplan Leipzig",
     "description": " ",
     "thumb": "https://cdn.glitch.com/daed98bf-70d1-4654-899f-c13129400cff%2FScreen%20Shot%202018-07-07%20at%2010.21.51%20PM.png?1531016525760",
-    "path": "/home/eiscreme/fancy_LVB_Telegram_Bot/Stadtplan_Leipzig.pdf"
+    "path": "/usr/src/app/public/maps/Stadtplan_Leipzig.pdf"
   },
 
   {
     "title": "Tarifzonenplan MDV",
     "description": "Überblick ",
     "thumb": "https://cdn.glitch.com/daed98bf-70d1-4654-899f-c13129400cff%2FScreen%20Shot%202018-07-07%20at%2010.22.50%20PM.png?1531016626672",
-    "path": "/home/eiscreme/fancy_LVB_Telegram_Bot/Tarifzonenplan_MDV.pdf"
+    "path": "/usr/src/app/public/maps/Tarifzonenplan_MDV.pdf"
   }
-
 ]
