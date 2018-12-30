@@ -27,7 +27,7 @@ exports.TELEGRAM_TOKEN = "<vom BotFather generierter Access-Token für den eben 
 
 ```
 docker build -t fancy_lvb_bot
-docker run -d fancy_lvb_bot:latest
+docker run -v /etc/localtime:/etc/localtime:ro -v /etc/timezone:/etc/timezone:ro --restart=always --name fancylvbbot -d fancy_lvb_bot:latest
 ```
 
 ## Test-Ausführung
