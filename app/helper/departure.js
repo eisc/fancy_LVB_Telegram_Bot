@@ -2,16 +2,18 @@ const moment = require('moment')
 const { departures } = require('lvb')
 
 exports.getDeparturesForStation = function (bot, msg, station) {
-    normalizeStationId(station)
-    departures(station.id, new Date()).then(
+    departures(normalizeStationId(station.id), new Date()).then(
         departure => handleDeparture(bot, msg, station, departure)
     ).catch(error => {
         bot.sendMessage(msg.chat.id, 'Fehler ' + error)
     })
 }
 
-function normalizeStationId(station) {
-    station.id = station.id.substring(4)
+function normalizeStationId(stationId) {
+    if (stationId.startsWith('1:')) {
+        return stationId.substring(4)
+    }
+    return stationId
 }
 
 function handleDeparture(bot, msg, station, departureResults) {
