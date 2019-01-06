@@ -3,7 +3,7 @@ const NodeCache = require('node-cache')
 const gtfsCache = new NodeCache();
 const stopKey = "stops"
 
-exports.fetchAllStops = function() {
+exports.fetchAllStops = function(bot, msg) {
     const stops = gtfsCache.get(stopKey)
     if(stops) {
         return Promise.resolve(stops);
@@ -16,8 +16,8 @@ exports.fetchAllStops = function() {
                 return retrievedStops 
             }
         )
-    } catch(error) {
-        console.log(error)
+    } catch (error) {
+        bot.sendMessage(msg, 'Fehler beim Abrufen der Haltestellen')
         return Promise.resolve([])
     }
 }

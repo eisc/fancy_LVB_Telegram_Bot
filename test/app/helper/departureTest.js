@@ -2,6 +2,7 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const rewire = require('rewire');
 const sut = rewire('../../../app/helper/departure.js');
+/* eslint no-underscore-dangle: ["error", { "allow": ["__get__"] }] */
 const handleDepartureTime = sut.__get__('handleDepartureTime')
 const createAnswerForDepartureResult = sut.__get__('createAnswerForDepartureResult')
 const handleDeparture = sut.__get__('handleDeparture')
