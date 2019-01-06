@@ -18,6 +18,6 @@ exports.fetchAllStops = function() {
         )
     } catch(error) {
         console.log(error)
-        return []
+        return Promise.resolve([])
     }
 }
