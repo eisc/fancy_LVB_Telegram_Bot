@@ -70,7 +70,7 @@ describe('test helper module stations', () => {
         beforeEach(() => {
             bot = {
                 sendMessage: () => null,
-                on: () => null,
+                once: () => null,
                 answerCallbackQuery: () => null
             };
             sendMessageSpy = sinon.spy(bot, 'sendMessage');
@@ -105,7 +105,7 @@ describe('test helper module stations', () => {
         });
 
         it('should call passed in function with all stations when multiple stations, but less than 11', () => {
-            const onSpy = sinon.spy(bot, 'on'); 
+            const onceSpy = sinon.spy(bot, 'once'); 
             const answerCallbackQuerySpy = sinon.spy(bot, 'answerCallbackQuery'); 
             const stations = []
             for (var listIndex = 0; listIndex < 10; listIndex += 1) {
@@ -123,7 +123,7 @@ describe('test helper module stations', () => {
             }
             handleMatchingStations(bot, msg, stations, requestString,
                 handleMatchingStationFunFake)
-            assertAnswerForMultipleStation(sendMessageSpy, onSpy, bot, msg, 
+            assertAnswerForMultipleStation(sendMessageSpy, onceSpy, bot, msg, 
                 handleMatchingStationFunFake, answerCallbackQuerySpy, keyboardEntries)
         });
 
@@ -144,7 +144,7 @@ describe('test helper module stations', () => {
     function assertAnswerForNoStations(sendMessageSpy, myChatId, requestString) {
         const call = sendMessageSpy.getCall(0);
         expect(call.args[0]).to.equal(myChatId);
-        const expectedAnswer = requestString + ' nicht gefunden.'
+        const expectedAnswer = requestString + ' ist keine Haltestelle, versuch es nochmal. \u{1F643}'
         expect(call.args[1]).eq(expectedAnswer);
     }
 
@@ -159,7 +159,7 @@ describe('test helper module stations', () => {
         });
     }    
 
-    function assertAnswerForMultipleStation(sendMessageSpy, onSpy, bot, msg, 
+    function assertAnswerForMultipleStation(sendMessageSpy, onceSpy, bot, msg, 
             handleMatchingStationFunFake, answerCallbackQuerySpy, keyboardEntries) {
         const call = sendMessageSpy.getCall(0);
         expect(call.args[0]).to.equal(myChatId);
@@ -171,9 +171,9 @@ describe('test helper module stations', () => {
             }
         }
         expect(call.args[2]).to.deep.eql(expectedKeyboard);
-        const onCall = onSpy.getCall(0);
-        expect(onCall.args[0]).to.equal('callback_query');
-        const queryFun = onCall.args[1];
+        const onceCall = onceSpy.getCall(0);
+        expect(onceCall.args[0]).to.equal('callback_query');
+        const queryFun = onceCall.args[1];
         assertQueryAfterMultipleSelection(sendMessageSpy, bot, msg, 
             handleMatchingStationFunFake, queryFun, answerCallbackQuerySpy)
     }    

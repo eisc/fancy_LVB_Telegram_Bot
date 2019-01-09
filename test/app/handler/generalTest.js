@@ -57,8 +57,6 @@ describe('test handleCommandStart and handleCommandHelp', () => {
         expect(call.args[1].includes('Mit /plan ')).to.be.true;
         expect(call.args[1].includes('Mit /add ')).to.be.true;
         expect(call.args[1].includes('Mit /reset ')).to.be.true;
-        expect(call.args[1].includes('Mit /onlocation ')).to.be.true;
-        expect(call.args[1].includes('Bei /station ')).to.be.true;
       });      
     });    
 });
