@@ -11,7 +11,7 @@ const bot = require('./helper/bot').createBot()
 
 bot.onText(/\/start/, (msg) => handleCommandStart(bot, msg))
 bot.onText(/\/help/, (msg) => handleCommandHelp(bot, msg))
-bot.onText(/\/plan(\s*)(.*)/, (msg, match) => handleCommandPlan(bot, msg, match))
+bot.onText(/\/plan/, (msg, match) => handleCommandPlan(bot, msg, match))
 bot.onText(/\/add(\s*)(.*)/, (msg, match) => handleCommandAdd(bot, msg, match))
 bot.onText(/\/reset(\s*)(.*)/, (msg, match) => handleCommandReset(bot, msg, match))
 bot.on('location', (msg) => handleCommandLocation(bot, msg))

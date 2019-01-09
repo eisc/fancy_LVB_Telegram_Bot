@@ -11,7 +11,7 @@ exports.handleMatchingStations = function (bot, msg, stations, requestString,
     if (tooManyStationsFound(stations)) {
         bot.sendMessage(msg.chat.id, 'Es gibt zu viele Treffer, bitte gib was genaueres ein.')
     } else if (noStationsFound(stations)) {
-        bot.sendMessage(msg.chat.id, `${requestString} nicht gefunden.`)
+        bot.sendMessage(msg.chat.id, `${requestString} ist keine Haltestelle, versuch es nochmal. \u{1F643}`)
     } else if (stations.length === 1) {
         handleMatchingStationFun(bot, msg, stations[0])
     } else {
@@ -21,10 +21,10 @@ exports.handleMatchingStations = function (bot, msg, stations, requestString,
 
 function handleMultipleMatchingStations(bot, msg, stations, handleMatchingStationFun) {
     const selectableStationNames = transformToSelectableStationNames(stations);
-    bot.sendMessage(msg.chat.id, 
+    bot.sendMessage(msg.chat.id,
         `Meintest du eine dieser ${selectableStationNames.length} Haltestellen?`,
         offerMatchingStationsForSelection(selectableStationNames));
-    const handled = [];    
+    const handled = [];
     bot.on('callback_query', query => {
         const station = stations.find(station => station.id === query.data);
         bot.answerCallbackQuery(query.id);

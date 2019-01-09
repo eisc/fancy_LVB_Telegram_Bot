@@ -6,11 +6,12 @@ exports.handleCommandStart = function (bot, msg) {
 
 exports.handleCommandHelp = function (bot, msg) {
     bot.sendMessage(msg.chat.id, 'Hier eine Übersicht über alle Funkionen:'
-        + '\n\n• Mit /plan bekommst du den Liniennetzplan als PDF geschickt.\n'
-        + '• Mit /add kannst du eine Kurzwahlliste erstellen. Gib dazu einfach '
-        + 'ein Namen einer Haltestelle ein.\n• Mit /reset kannst du die Kurzwahlliste '
-        + 'komplett löschen. Gibst du den Namen einer Haltestelle ein, dann löscht es '
-        + 'nur diese aus der Liste.\n• Mit /onlocation kannst du mir deinen Standort '
-        + 'senden und dir die 5 nächstgelegenen Haltestellen anzeigen lassen.\n'
-        + '• Bei /station wird dir der Standort einer Haltestelle angezeigt.')
+        + '\n\n• Tippe einfach einen Haltestellennamen oder einen Teil davon ein um die'
+        + 'Abfahrten dort angezeigt zu bekommen.\n'
+        + '• Mit /add kannst du eine Kurzwahlliste erstellen.\n'
+        + '• Mit /reset kannst du die Kurzwahlliste löschen. Gibst du den Namen einer '
+        + 'Haltestelle ein, dann löscht es nur diese aus der Liste.\n'
+        + '• Sende mir deinen Standort ich zeige dir die 5 nächstgelegenen Haltestellen.\n'
+        + '• Mit /station kannst du dir den Standort einer Haltestelle anzeigen lassen.\n'
+        + '• Mit /plan bekommst du den Liniennetzplan als PDF geschickt.\n')
 }

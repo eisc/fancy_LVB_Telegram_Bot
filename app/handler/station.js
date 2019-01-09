@@ -3,14 +3,10 @@ const { getMatchingStations, handleMatchingStations } = require('../helper/stati
 const { getDeparturesForStation } = require('../helper/departure')
 
 exports.handlePotentialStation = function (bot, msg, match) {
-    if (match[0] === '') {
-        bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
-        return
-    }
     fetchAllStops().then(data => {
-        const matchingStations = getMatchingStations(data, match[0])
+        const matchingStations = getMatchingStations(data, match)
         return Promise.resolve(matchingStations)
-    }).then(stations => handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))
+    }).then(stations => handleMatchingStations(bot, msg, stations, match, handleMatchingStation))
 }
 
 function handleMatchingStation(bot, msg, station) {
