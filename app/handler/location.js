@@ -11,7 +11,7 @@ exports.handleCommandLocation = function (bot, msg) {
             ]
         }
     })
-    bot.on('callback_query', query => {
+    bot.once('callback_query', query => {
         if (query.data === 'db[station.id]') {
             bot.answerCallbackQuery(query.id)
             bot.sendMessage(msg.chat.id, `Das sind die nächsten 10 Abfahrten:`)

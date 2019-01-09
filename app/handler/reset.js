@@ -22,7 +22,7 @@ function toStationObject(stationName) {
 
 function handleDeleteCompleteListRequest(bot, msg) {
     bot.sendMessage(msg.chat.id, 'gesamte Liste löschen?', secondDeleteCompleteListRequest());
-    bot.on('callback_query', query => handleSecondDeleteCompleteListRequest(bot, msg, query));
+    bot.once('callback_query', query => handleSecondDeleteCompleteListRequest(bot, msg, query));
 }
 
 function secondDeleteCompleteListRequest() {

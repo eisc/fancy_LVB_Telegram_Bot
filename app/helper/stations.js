@@ -24,12 +24,10 @@ function handleMultipleMatchingStations(bot, msg, stations, handleMatchingStatio
     bot.sendMessage(msg.chat.id,
         `Meintest du eine dieser ${selectableStationNames.length} Haltestellen?`,
         offerMatchingStationsForSelection(selectableStationNames));
-    const handled = [];
-    bot.on('callback_query', query => {
+    bot.once('callback_query', query => {
         const station = stations.find(station => station.id === query.data);
         bot.answerCallbackQuery(query.id);
-        if (station && handled.indexOf(station) === -1) {
-            handled.push(station)
+        if (station) {
             handleMatchingStationFun(bot, msg, station)
         }
     });

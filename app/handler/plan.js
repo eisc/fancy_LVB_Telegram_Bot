@@ -2,7 +2,7 @@ let jmap = require('../../config/maps.json')
 
 exports.handleCommandPlan = function (bot, msg) {
     bot.sendMessage(msg.chat.id, 'Welchen Netzplan möchtest du haben?', getPlanSelection())
-    bot.on('callback_query', query => handlePlanSelection(bot, msg, query))
+    bot.once('callback_query', query => handlePlanSelection(bot, msg, query))
 }
 
 function getPlanSelection() {
