@@ -1,5 +1,7 @@
 # fancy_LVB_Telegram_Bot
 
+[![Coverage Status](https://coveralls.io/repos/github/eisc/fancy_LVB_Telegram_Bot/badge.svg?branch=master)](https://coveralls.io/github/eisc/fancy_LVB_Telegram_Bot?branch=master)
+
 # TODOs
 
  * Fahrplandaten einfügen
