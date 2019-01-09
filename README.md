@@ -4,6 +4,7 @@
 
 # TODOs
 
+ * Travis CI Integration
  * Fahrplandaten einfügen
  * Haltestelle per Eingabe anfragen (-> Ausgabe: nächsten Abfahrten an der Haltestelle)
  * nächstgelegenen Haltestellen per Standort anfragen
