@@ -44,11 +44,11 @@ function createAnswerForDepartureResult(station, res) {
 
 function handleDepartureTime(time) {
     const depTime = new Date(Date.parse(time.departure))
-    const departureStr = moment(depTime).format('HH:mm:ss')
+    const departureStr = moment(depTime).format('HH:mm')
     var answer = `- um ${departureStr}`
     if (time.departureDelay !== 0) {
         const delay = new Date(time.departureDelay)
-        const delayStr = moment(delay).format('mm:ss')
+        const delayStr = moment(delay).format('m')
         answer += ` mit einer Verspätung von ${delayStr} Minuten`
     }
     answer += '\n'
