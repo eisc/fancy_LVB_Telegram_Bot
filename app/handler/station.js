@@ -9,7 +9,7 @@ exports.handlePotentialStation = function (bot, msg, match) {
     }).then(stations => handleMatchingStations(bot, msg, stations, match, handleMatchingStation))
 }
 
-function handleMatchingStation(bot, msg, station) {
+ exports.handleMatchingStation = function (bot, msg, station) {
     bot.sendMessage(msg.chat.id, `Das sind die nächsten Abfahrten für ${station.name}:`)
     getDeparturesForStation(bot, msg, station);
 }
