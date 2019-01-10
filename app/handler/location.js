@@ -3,12 +3,14 @@ const { handleMatchingStation } = require('./station')
 
 exports.handleCommandLocation = function (bot, msg) {
   fetchAllStops().then(data => {
-    const dataWithDistance = data.map(stop => {
-      stop.distance = Math.sqrt(Math.pow((msg.location.latitude - stop.lat) * Math.cos((msg.location.longitude - stop.lon) / 2), 2) + Math.pow(msg.location.longitude - stop.lon, 2)) * 6371
+    let dataWithDistance = data.map(stop => {
+      stop.distance = Math.sqrt(Math.pow((msg.location.longitude - stop.lon) * Math.cos((msg.location.latitude + stop.lat) / 2), 2) + Math.pow(msg.location.latitude - stop.lat, 2)) * 6371
       return stop
     })
-    Promise.resolve(dataWithDistance.sort((entry1, entry2) => entry1.distance - entry2.distance))
+    dataWithDistance = dataWithDistance.sort((entry1, entry2) => entry1.distance - entry2.distance)
     const selection = dataWithDistance.slice(0, 5)
+    // console.log(msg.location);
+    // console.log(selection);
     const stationNames = selection.map(station => {
       return [{ text: station.name + ` (${Math.round(station.distance)}m)`, callback_data: station.id }]
     })
