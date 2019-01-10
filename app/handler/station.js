@@ -4,12 +4,13 @@ const { getDeparturesForStation } = require('../helper/departure')
 
 exports.handlePotentialStation = function (bot, msg, match) {
     fetchAllStops().then(data => {
-        const matchingStations = getMatchingStations(data, match)
+        const matchingStations = getMatchingStations(data, match[0])
         return Promise.resolve(matchingStations)
-    }).then(stations => handleMatchingStations(bot, msg, stations, match, handleMatchingStation))
+    }).then(stations => handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))
 }
 
- exports.handleMatchingStation = function (bot, msg, station) {
+function handleMatchingStation (bot, msg, station) {
     bot.sendMessage(msg.chat.id, `Das sind die nächsten Abfahrten für ${station.name}:`)
     getDeparturesForStation(bot, msg, station);
 }
+exports.handleMatchingStation = handleMatchingStation;
