@@ -1,10 +1,10 @@
-const { fetchAllStops } = require('../helper/gtfs')
-const { handleMatchingStation } = require('./station')
+const gtfsHelper = require('../helper/gtfs')
+const stationHelper = require('./station')
 
 exports.handleCommandLocation = function (bot, msg) {
-  fetchAllStops().then(data => {
+  gtfsHelper.fetchAllStops().then(data => {
     let dataWithDistance = data.map(stop => {
-      stop.distance = Math.sqrt(Math.pow((msg.location.longitude - stop.lon) * Math.cos((msg.location.latitude + stop.lat) / 2), 2) + Math.pow(msg.location.latitude - stop.lat, 2)) * 6371
+      stop.distance = Math.sqrt(Math.pow((msg.location.longitude - stop.lon) * Math.cos((msg.location.latitude + stop.lat) / 2), 2) + Math.pow(msg.location.latitude - stop.lat, 2)) * 63710
       return stop
     })
     dataWithDistance = dataWithDistance.sort((entry1, entry2) => entry1.distance - entry2.distance)
@@ -22,7 +22,7 @@ exports.handleCommandLocation = function (bot, msg) {
     bot.once('callback_query', query => {
       const station = selection.find(station => station.id === query.data)
       bot.answerCallbackQuery(query.id)
-      handleMatchingStation(bot, msg, station)
+      stationHelper.handleMatchingStation(bot, msg, station)
     })
   })
 }

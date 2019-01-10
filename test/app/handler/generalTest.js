@@ -54,8 +54,11 @@ describe('test handleCommandStart and handleCommandHelp', () => {
         const call = sendMessageSpy.getCall(0);
         expect(call.args[0]).to.equal(myChatId);
         expect(call.args[1].startsWith('Hier eine Übersicht über alle Funkionen:')).to.be.true;
+        expect(call.args[1].includes('Tippe einfach einen Haltestellennamen')).to.be.true;
+        expect(call.args[1].includes('Sende mir deinen Standort')).to.be.true;
         expect(call.args[1].includes('Mit /plan ')).to.be.true;
         expect(call.args[1].includes('Mit /add ')).to.be.true;
+        expect(call.args[1].includes('Mit /station ')).to.be.true;
         expect(call.args[1].includes('Mit /reset ')).to.be.true;
       });      
     });    

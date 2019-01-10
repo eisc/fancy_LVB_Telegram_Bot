@@ -47,10 +47,21 @@ function handleDepartureTime(time) {
     const departureStr = moment(depTime).format('HH:mm')
     var answer = `- um ${departureStr}`
     if (time.departureDelay !== 0) {
-        const delay = new Date(time.departureDelay)
-        const delayStr = moment(delay).format('m')
-        answer += ` mit einer Verspätung von ${delayStr} Minuten`
+        answer += handleDelay(time);
     }
     answer += '\n'
     return answer
 }
+
+function handleDelay(time) {
+    const delay = new Date(time.departureDelay);
+    const delayMinutes = delay.getMinutes();
+    if (delayMinutes > 0) {
+        const ending = delayMinutes > 1
+            ? 'n'
+            : '';
+        return ` mit einer Verspätung von ${delayMinutes} Minute${ending}`;
+    }
+    return '';
+}
+

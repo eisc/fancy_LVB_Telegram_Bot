@@ -16,19 +16,30 @@ describe('test departure calculation', () => {
                 departureDelay: 0
             };
             const answer = handleDepartureTime(time)
-            const expectedAnswer = '- um 21:33:15\n'
+            const expectedAnswer = '- um 21:33\n'
             expect(answer).to.equal(expectedAnswer)
         });
 
         it('should send answer with delay included, when delay is greater 0', () => {
             const time = {
                 departure: '2018-12-25T21:33:15.050+0100',
-                departureDelay: 3000
+                departureDelay: 180000
             };
             const answer = handleDepartureTime(time)
-            const expectedAnswer = '- um 21:33:15 mit einer Verspätung von 00:03 Minuten\n'
+            const expectedAnswer = '- um 21:33 mit einer Verspätung von 3 Minuten\n'
+            expect(answer).to.equal(expectedAnswer)
+        });
+
+        it('should send "Minute" instead of "Minutes" when only one minute delay', () => {
+            const time = {
+                departure: '2018-12-25T21:33:15.050+0100',
+                departureDelay: 60000
+            };
+            const answer = handleDepartureTime(time)
+            const expectedAnswer = '- um 21:33 mit einer Verspätung von 1 Minute\n'
             expect(answer).to.equal(expectedAnswer)
         });        
+
     });
 
     describe('test createAnswerForDepartureResult', () => {
@@ -72,8 +83,8 @@ describe('test departure calculation', () => {
             const answer = createAnswerForDepartureResult(station, result)
             const expectedAnswer = 'Abfahrt ab ' + stationName + ' von ' + lineName
                 + ' in Richtung ' + lineDirection + '\n' 
-                + '- um 21:33:15 mit einer Verspätung von 00:03 Minuten\n'
-                + '- um 21:50:00\n'
+                + '- um 21:33 mit einer Verspätung von 3 Minuten\n'
+                + '- um 21:50\n'
             expect(answer).to.equal(expectedAnswer)
         });         
     });    
@@ -139,7 +150,7 @@ describe('test departure calculation', () => {
             timetable: [
                 {
                     departure: '2018-12-25T21:33:15.050+0100',
-                    departureDelay: 3000
+                    departureDelay: 180000
                 },
                 {
                     departure: '2018-12-25T21:50:00.000+0100',
@@ -169,7 +180,7 @@ describe('test departure calculation', () => {
         expect(call2.args[0]).to.equal(myChatId);
         const expectedAnswer2 = 'Abfahrt ab MyStation von MyLine2'
             + ' in Richtung MyLineDirection2\n'
-            + '- um 21:55:00\n';
+            + '- um 21:55\n';
         expect(call2.args[1]).eq(expectedAnswer2);
     }
     
@@ -178,8 +189,8 @@ describe('test departure calculation', () => {
         expect(call1.args[0]).to.equal(myChatId);
         const expectedAnswer1 = 'Abfahrt ab MyStation von MyLine1'
             + ' in Richtung MyLineDirection1\n'
-            + '- um 21:33:15 mit einer Verspätung von 00:03 Minuten\n'
-            + '- um 21:50:00\n';
+            + '- um 21:33 mit einer Verspätung von 3 Minuten\n'
+            + '- um 21:50\n';
         expect(call1.args[1]).eq(expectedAnswer1);
         return { call1, expectedAnswer1 };
     }    
