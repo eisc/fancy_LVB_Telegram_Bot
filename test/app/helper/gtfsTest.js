@@ -22,12 +22,12 @@ describe('test helper module gtfs', () => {
             bot = {
                 sendMessage: () => null
             };
-            sendMessageSpy = sinon.spy(bot, 'sendMessage');    
+            sendMessageSpy = sinon.spy(bot, 'sendMessage');
             msg = {
                 chat: {
                     id: myChatId
                 }
-            };            
+            };
         })
 
         afterEach(() => {
@@ -117,8 +117,8 @@ describe('test helper module gtfs', () => {
         const cacheCall2 = gtfsCacheSetSpy.getCall(0);
         expect(cacheCall2.args[0]).to.equal('stops');
         expect(cacheCall2.args[1]).to.equal(jsonContent);
-    }  
-    
+    }
+
     function assertBotErrorMessage(sendMessageSpy, msg) {
         const call = sendMessageSpy.getCall(0)
         expect(call.args[0]).to.equal(msg)

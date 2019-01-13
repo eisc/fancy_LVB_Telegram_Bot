@@ -1,4 +1,4 @@
-let jmap = require('../../config/maps.json')
+const jmap = require('../../config/maps.json')
 
 exports.handleCommandPlan = function (bot, msg) {
     bot.sendMessage(msg.chat.id, 'Welchen Netzplan möchtest du haben?', getPlanSelection())
