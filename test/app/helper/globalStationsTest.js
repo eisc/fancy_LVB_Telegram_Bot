@@ -2,10 +2,10 @@ const expect = require('chai').expect;
 const { 
     getGlobalStations, 
     addGlobalStation,
-    removeFromGlobalStation, 
+    removeFromGlobalStations, 
     deleteGlobalStations,
     globalStationsAsKeyboard 
-} = require('../../../app/helper/globalStations');
+} = require('../../../app/helper/globalstations');
 
 describe('test globalStations', () => {
 
@@ -49,14 +49,14 @@ describe('test globalStations', () => {
             const stationName2 = 'myStationName2';
             addGlobalStation(stationName1)
             addGlobalStation(stationName2)
-            removeFromGlobalStation(stationName1)
+            removeFromGlobalStations(stationName1)
             expect(getGlobalStations()).to.have.all.members([stationName2])
         });
 
         it('one exists, one removed, global is empty', () => {
             const stationName1 = 'myStationName1';
             addGlobalStation(stationName1)
-            removeFromGlobalStation(stationName1)
+            removeFromGlobalStations(stationName1)
             expect(getGlobalStations()).to.have.length(0)
         });
 
@@ -65,7 +65,7 @@ describe('test globalStations', () => {
             const stationName2 = 'myStationName2';
             addGlobalStation(stationName1)
             addGlobalStation(stationName2)
-            removeFromGlobalStation('stationName3')
+            removeFromGlobalStations('stationName3')
             const expectedStations = [
                 stationName1,
                 stationName2

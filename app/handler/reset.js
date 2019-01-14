@@ -1,16 +1,15 @@
-const { getGlobalStations, globalStationsAsKeyboard, removeFromGlobalStation, deleteGlobalStations }
-    = require('../helper/globalstations')
-const { getMatchingStations, handleMatchingStations } = require('../helper/stations')
+const globalStationsHelper = require('../helper/globalstations')
+const stationsHelper = require('../helper/stations')
 
 exports.handleCommandReset = function (bot, msg, match) {
-    if (getGlobalStations().length === 0) {
+    if (globalStationsHelper.getGlobalStations().length === 0) {
         bot.sendMessage(msg.chat.id, 'Liste ist bereits leer.')
         return
     }
     if (match[2]) {
-        const stations = getGlobalStations().map(stationName => toStationObject(stationName))
-        const matchingStations = getMatchingStations(stations, match[2])
-        handleMatchingStations(bot, msg, matchingStations, match[2], handleMatchingStation)
+        const stations = globalStationsHelper.getGlobalStations().map(stationName => toStationObject(stationName))
+        const matchingStations = stationsHelper.getMatchingStations(stations, match[2])
+        stationsHelper.handleMatchingStations(bot, msg, matchingStations, match[2], handleMatchingStation)
     } else {
         handleDeleteCompleteListRequest(bot, msg);
     }
@@ -41,11 +40,11 @@ function secondDeleteCompleteListRequest() {
 function handleSecondDeleteCompleteListRequest(bot, msg, query) {
     bot.answerCallbackQuery(query.id);
     if (query.data === 'reset') {
-        if (getGlobalStations().length === 0) {
+        if (globalStationsHelper.getGlobalStations().length === 0) {
             bot.sendMessage(msg.chat.id, 'Liste ist bereits leer.');
             return;
         }
-        deleteGlobalStations();
+        globalStationsHelper.deleteGlobalStations();
         bot.sendMessage(query.message.chat.id, 'Liste wurde gelöscht', removeKeyboard());
     } else {
         bot.sendMessage(query.message.chat.id, 'Ok, dann nicht.');
@@ -53,10 +52,11 @@ function handleSecondDeleteCompleteListRequest(bot, msg, query) {
 }
 
 function handleMatchingStation(bot, msg, station) {
-    getGlobalStations().length === 1
-        ? bot.sendMessage(msg.chat.id, `${station.name} wurde gelöscht.`, removeKeyboard())
-        : removeFromGlobalStation(station.name);
-    bot.sendMessage(msg.chat.id, `${station.name} wurde gelöscht.`, globalStationsAsKeyboard());
+    globalStationsHelper.getGlobalStations().length === 1
+        ? globalStationsHelper.deleteGlobalStations()
+        : globalStationsHelper.removeFromGlobalStations(station.name);
+    bot.sendMessage(msg.chat.id, `${station.name} wurde gelöscht.`, 
+        globalStationsHelper.globalStationsAsKeyboard());
 }
 
 function removeKeyboard() {

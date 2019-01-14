@@ -4,7 +4,7 @@ const sinon = require('sinon');
 const rewire = require('rewire');
 const sut = rewire('../../../app/handler/plan');
 
-describe.only('test plan handler', () => {
+describe('test plan handler', () => {
     var bot = null;
     var sendMessageSpy = null;
     var msg = null;

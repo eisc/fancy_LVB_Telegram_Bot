@@ -10,7 +10,7 @@ exports.addGlobalStation = function (name) {
     }
 }
 
-exports.removeFromGlobalStation = function(station) {
+exports.removeFromGlobalStations = function(station) {
     if(globalStations.indexOf(station) !== -1) {
         globalStations.splice(globalStations.indexOf(station), 1)
     }
