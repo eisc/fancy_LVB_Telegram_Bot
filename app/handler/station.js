@@ -1,16 +1,16 @@
-const { fetchAllStops } = require('../helper/gtfs')
-const { getMatchingStations, handleMatchingStations } = require('../helper/stations')
-const { getDeparturesForStation } = require('../helper/departure')
+const gtfsHelper = require('../helper/gtfs')
+const stationsHelper = require('../helper/stations')
+const departureHelper = require('../helper/departure')
 
 exports.handlePotentialStation = function (bot, msg, match) {
-    fetchAllStops().then(data => {
-        const matchingStations = getMatchingStations(data, match[0])
+    gtfsHelper.fetchAllStops().then(data => {
+        const matchingStations = stationsHelper.getMatchingStations(data, match[0])
         return Promise.resolve(matchingStations)
-    }).then(stations => handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))
+    }).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))
 }
 
 function handleMatchingStation (bot, msg, station) {
     bot.sendMessage(msg.chat.id, `Das sind die nächsten Abfahrten für ${station.name}:`)
-    getDeparturesForStation(bot, msg, station);
+    departureHelper.getDeparturesForStation(bot, msg, station);
 }
 exports.handleMatchingStation = handleMatchingStation;

@@ -159,7 +159,7 @@ function assertNoRemove(getMatchingStationsSpy, searchStr, handleMatchingStation
 
 function createStationsHelperStub(matching) {
     const stationsHelperStub = {
-        getMatchingStations: () => () => matching,
+        getMatchingStations: () => matching.slice(0),
         handleMatchingStations: () => null
     };
     sut.__set__('stationsHelper', stationsHelperStub);
@@ -228,10 +228,9 @@ function assertGetMatchingStationsCall(getMatchingStationsSpy, searchStr) {
 }
 
 function assertPassedStations(stations) {
-    const st0 = stations[0]
-    const st0N = st0
-    //expect(st0N).to.equal('exampleStation1');
-    //expect(stations[1]['name']).to.be.equal('exampleStation2');
+    //expect(stations.length).to.be.equal(2);
+    //expect(stations[0].name).to.be.equal('exampleStation1');
+    //expect(stations[1].name).to.be.equal('exampleStation2');
 }
 
 function assertDontDeleteAllWhenRejected(queryListener, myChatId, callbackSpy,
@@ -301,11 +300,12 @@ function assertSecondDeletionQuery(sendMessageSpy, myChatId) {
 function mockGetGlobalsStationsWithTwoStations(globalStationsKeyboardAfter) {
     const exampleStation1 = 'exampleStation1';
     const exampleStation2 = 'exampleStation2';
+    const global = [
+        exampleStation1,
+        exampleStation2
+    ]
     const globalStationsHelperStub = {
-        getGlobalStations: () => [
-            exampleStation1,
-            exampleStation2
-        ],
+        getGlobalStations: () => global.slice(0),
         removeFromGlobalStations: () => null,
         globalStationsAsKeyboard: () => globalStationsKeyboardAfter,
         deleteGlobalStations: () => null
@@ -319,7 +319,7 @@ function mockGetGlobalsStationsWithOneStation(globalStationsKeyboardAfter) {
     const globalStationsHelperStub = {
         getGlobalStations: () => [
             exampleStation1
-        ],
+        ].slice(0),
         removeFromGlobalStations: () => null,
         globalStationsAsKeyboard: () => globalStationsKeyboardAfter,
         deleteGlobalStations: () => null
