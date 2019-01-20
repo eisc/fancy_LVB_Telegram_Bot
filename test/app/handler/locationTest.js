@@ -59,7 +59,7 @@ describe('test location handler', () => {
 });
 
 function getMsgWithPosition(msg) {
-    const position = {        
+    const position = {
         latitude: 51.33104066938517,
         longitude: 12.37386703491211
     }

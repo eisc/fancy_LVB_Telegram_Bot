@@ -44,8 +44,8 @@ describe('test station handler', () => {
 
             sut.handlePotentialStation(bot, msg, [stationName])
 
-            return assertMembersOfChainAreCalled(dataPromise, getMatchingStationsSpy, stationName, 
-                handleMatchingStationsSpy, bot, msg, matchingStations, sendMessageSpy, myChatId, 
+            return assertMembersOfChainAreCalled(dataPromise, getMatchingStationsSpy, stationName,
+                handleMatchingStationsSpy, bot, msg, matchingStations, sendMessageSpy, myChatId,
                 getDeparturesForStationSpy)
         });
     });
@@ -66,8 +66,8 @@ function getDummyStops() {
     ];
 }
 
-function assertMembersOfChainAreCalled(dataPromise, getMatchingStationsSpy, stationName, 
-        handleMatchingStationsSpy, bot, msg, matchingStations, sendMessageSpy, myChatId, 
+function assertMembersOfChainAreCalled(dataPromise, getMatchingStationsSpy, stationName,
+        handleMatchingStationsSpy, bot, msg, matchingStations, sendMessageSpy, myChatId,
         getDeparturesForStationSpy) {
     return dataPromise.then((dat) => {
         expect(dat).to.be.equal(dummyStops)
@@ -75,15 +75,15 @@ function assertMembersOfChainAreCalled(dataPromise, getMatchingStationsSpy, stat
         return Promise.resolve(matchingStations)
     }).then((matchingStops) => {
         expect(matchingStops).to.be.equal(matchingStations)
-        const passedFunction = assertHandleMatchingStationsCall(handleMatchingStationsSpy, 
+        const passedFunction = assertHandleMatchingStationsCall(handleMatchingStationsSpy,
             bot, msg, matchingStops, stationName);
         passedFunction(bot, msg, matchingStations[0]);
-        assertPassedFunctionCall(sendMessageSpy, myChatId, getDeparturesForStationSpy, 
+        assertPassedFunctionCall(sendMessageSpy, myChatId, getDeparturesForStationSpy,
             bot, msg, matchingStations);
     });
 }
 
-function assertPassedFunctionCall(sendMessageSpy, myChatId, getDeparturesForStationSpy, bot, 
+function assertPassedFunctionCall(sendMessageSpy, myChatId, getDeparturesForStationSpy, bot,
         msg, matchingStations) {
     const botCall = sendMessageSpy.getCall(0);
     expect(botCall.args[0]).to.be.equal(myChatId);
@@ -102,12 +102,13 @@ function mockDepartureHelper() {
     return departureHelper;
 }
 
-function assertHandleMatchingStationsCall(handleMatchingStationsSpy, bot, msg, 
+function assertHandleMatchingStationsCall(handleMatchingStationsSpy, bot, msg,
         matchingStations, stationName) {
     const handleCall = handleMatchingStationsSpy.getCall(0);
     expect(handleCall.args[0]).to.be.equal(bot);
     expect(handleCall.args[1]).to.be.equal(msg);
-    //expect(handleCall.args[2]).to.be.equal(matchingStations);
+    // TODO: fix test setup
+    // expect(handleCall.args[2]).to.be.equal(matchingStations);
     expect(handleCall.args[3]).to.be.equal(stationName);
     const passFun = handleCall.args[4];
     return passFun;

@@ -1,7 +1,7 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
-const { 
-    getMatchingStations, 
+const {
+    getMatchingStations,
     handleMatchingStations
 } = require('../../../app/helper/stations');
 
@@ -27,7 +27,7 @@ describe('test helper module stations', () => {
         it('should return one element list when exactly one matching station', () => {
             expect(getMatchingStations([{
                 name: 'myOtherStationName'
-            }, 
+            },
             {
                 name: myStationName
             }], myStationName)).to.eql([{
@@ -45,16 +45,16 @@ describe('test helper module stations', () => {
                 },
                 {
                     name: withPostfix
-                }, 
+                },
                 {
                     name: withPrefix
                 }], myStationName)).to.eql([
                     {
                         name: inCenter
-                    }, 
+                    },
                     {
                         name: withPostfix
-                    }, 
+                    },
                     {
                         name: withPrefix
                     }])
@@ -93,20 +93,20 @@ describe('test helper module stations', () => {
         });
 
         it('should call passed in function with station when exactly one station', () => {
-            handleMatchingStations(bot, msg, [{ 
+            handleMatchingStations(bot, msg, [{
                 id: myStationName + 'Id',
-                name: myStationName 
+                name: myStationName
             }], requestString,
                 handleMatchingStationFunFake)
             const call = sendMessageSpy.getCall(0);
-            expect(call).to.be.null;       
-            assertAnswerForStation(bot, msg, handleMatchingStationFunFake, 0, 
+            expect(call).to.be.null;
+            assertAnswerForStation(bot, msg, handleMatchingStationFunFake, 0,
                 myStationName + 'Id', myStationName)
         });
 
         it('should call passed in function with all stations when multiple stations, but less than 11', () => {
-            const onceSpy = sinon.spy(bot, 'once'); 
-            const answerCallbackQuerySpy = sinon.spy(bot, 'answerCallbackQuery'); 
+            const onceSpy = sinon.spy(bot, 'once');
+            const answerCallbackQuerySpy = sinon.spy(bot, 'answerCallbackQuery');
             const stations = []
             for (var listIndex = 0; listIndex < 10; listIndex += 1) {
                 stations.push({
@@ -123,7 +123,7 @@ describe('test helper module stations', () => {
             }
             handleMatchingStations(bot, msg, stations, requestString,
                 handleMatchingStationFunFake)
-            assertAnswerForMultipleStation(sendMessageSpy, onceSpy, bot, msg, 
+            assertAnswerForMultipleStation(sendMessageSpy, onceSpy, bot, msg,
                 handleMatchingStationFunFake, answerCallbackQuerySpy, keyboardEntries)
         });
 
@@ -139,7 +139,7 @@ describe('test helper module stations', () => {
                 handleMatchingStationFunFake)
             assertAnswerForTooManyStations(sendMessageSpy, myChatId, requestString)
         });
-    });    
+    });
 
     function assertAnswerForNoStations(sendMessageSpy, myChatId, requestString) {
         const call = sendMessageSpy.getCall(0);
@@ -148,7 +148,7 @@ describe('test helper module stations', () => {
         expect(call.args[1]).eq(expectedAnswer);
     }
 
-    function assertAnswerForStation(bot, msg, handleMatchingStationFunStub, 
+    function assertAnswerForStation(bot, msg, handleMatchingStationFunStub,
             index, stationId, stationName) {
         const funCall = handleMatchingStationFunStub.getCall(index);
         expect(funCall.args[0]).to.eql(bot);
@@ -157,9 +157,9 @@ describe('test helper module stations', () => {
             id: stationId,
             name: stationName
         });
-    }    
+    }
 
-    function assertAnswerForMultipleStation(sendMessageSpy, onceSpy, bot, msg, 
+    function assertAnswerForMultipleStation(sendMessageSpy, onceSpy, bot, msg,
             handleMatchingStationFunFake, answerCallbackQuerySpy, keyboardEntries) {
         const call = sendMessageSpy.getCall(0);
         expect(call.args[0]).to.equal(myChatId);
@@ -174,11 +174,11 @@ describe('test helper module stations', () => {
         const onceCall = onceSpy.getCall(0);
         expect(onceCall.args[0]).to.equal('callback_query');
         const queryFun = onceCall.args[1];
-        assertQueryAfterMultipleSelection(sendMessageSpy, bot, msg, 
+        assertQueryAfterMultipleSelection(sendMessageSpy, bot, msg,
             handleMatchingStationFunFake, queryFun, answerCallbackQuerySpy)
-    }    
+    }
 
-    function assertQueryAfterMultipleSelection(sendMessageSpy, bot, msg, 
+    function assertQueryAfterMultipleSelection(sendMessageSpy, bot, msg,
             handleMatchingStationFunFake, queryFun, answerCallbackQuerySpy) {
         queryFun({
             id: 'myQueryId',
@@ -186,7 +186,7 @@ describe('test helper module stations', () => {
         })
         const callbackCall = answerCallbackQuerySpy.getCall(0);
         expect(callbackCall.args[0]).to.equal('myQueryId');
-        assertAnswerForStation(bot, msg, handleMatchingStationFunFake, 
+        assertAnswerForStation(bot, msg, handleMatchingStationFunFake,
             0, myStationName + 'Id0', myStationName + '0')
     }
 

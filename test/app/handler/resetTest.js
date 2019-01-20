@@ -32,7 +32,7 @@ describe('test reset handler', () => {
 
         it('when no global stations exist return immediately', () => {
             const globalStationsHelperStub = {
-                getGlobalStations: () => []
+                isEmpty: () => true
             };
             sut.__set__('globalStationsHelper', globalStationsHelperStub)
 
@@ -44,7 +44,8 @@ describe('test reset handler', () => {
         })
 
         it('when global stations exist, no station name was passed, and deletion is confirmed, remove all', () => {
-            const globalStationsHelperStub = mockGetGlobalsStationsWithTwoStations()
+            const matching = []
+            const globalStationsHelperStub = mockGetGlobalsStations(false, matching)
             const selectionSpy = sinon.spy(bot, 'once')
             const callbackSpy = sinon.spy(bot, 'answerCallbackQuery')
             const deleteGlobalStationsSpy = sinon.spy(globalStationsHelperStub, 'deleteGlobalStations')
@@ -59,7 +60,8 @@ describe('test reset handler', () => {
 
         it('when global stations exist, no station name was passed, and deletion is rejected, remove is not called', () => {
             const globalStationsKeyboardAfter = { dummy: 'dummy' }
-            const globalStationsHelperStub = mockGetGlobalsStationsWithTwoStations(globalStationsKeyboardAfter)
+            const matching = []
+            const globalStationsHelperStub = mockGetGlobalsStations(false, matching, globalStationsKeyboardAfter)
             const selectionSpy = sinon.spy(bot, 'once')
             const callbackSpy = sinon.spy(bot, 'answerCallbackQuery')
             const deleteGlobalStationsSpy = sinon.spy(globalStationsHelperStub, 'deleteGlobalStations')
@@ -74,10 +76,10 @@ describe('test reset handler', () => {
 
         it('when global stations exist, station name is given, but doesnt match existing, nothing is deleted', () => {
             const globalStationsKeyboardAfter = { dummy: 'dummy' }
-            const globalsStationsHelper = mockGetGlobalsStationsWithTwoStations(globalStationsKeyboardAfter)
             const matching = []
-            const stationsHelperStub = createStationsHelperStub(matching);
-            const getMatchingStationsSpy = sinon.spy(stationsHelperStub, 'getMatchingStations')
+            const globalsStationsHelper = mockGetGlobalsStations(false, matching, globalStationsKeyboardAfter)
+            const stationsHelperStub = createStationsHelperStub();
+            const getMatchingStationsSpy = sinon.spy(globalsStationsHelper, 'getMatchingGlobalStations')
             const handleMatchingStationsSpy = sinon.spy(stationsHelperStub, 'handleMatchingStations')
             const removeFromGlobalStationSpy = sinon.spy(globalsStationsHelper, 'removeFromGlobalStations')
 
@@ -87,17 +89,20 @@ describe('test reset handler', () => {
                 'b',
                 searchStr])
 
-            assertNoRemove(getMatchingStationsSpy, searchStr, handleMatchingStationsSpy, bot, msg,
-                removeFromGlobalStationSpy);
+            assertNoRemove(getMatchingStationsSpy, searchStr, matching, 
+                handleMatchingStationsSpy, bot, msg, removeFromGlobalStationSpy);
         })
 
         it('when global stations exist, station name is given, and match existing, this one is deleted', () => {
             const globalStationsKeyboardAfter = { dummy: 'dummy' }
-            const globalsStationsHelper = mockGetGlobalsStationsWithTwoStations(globalStationsKeyboardAfter)
             const searchStr = 'exampleStation1'
-            const matching = [searchStr]
-            const stationsHelperStub = createStationsHelperStub(matching);
-            const getMatchingStationsSpy = sinon.spy(stationsHelperStub, 'getMatchingStations')
+            const matching = [{
+                id: 'exampleStation1 Id',
+                name: 'exampleStation1 Name'
+            }]
+            const globalsStationsHelper = mockGetGlobalsStations(false, matching, globalStationsKeyboardAfter)
+            const stationsHelperStub = createStationsHelperStub();
+            const getMatchingStationsSpy = sinon.spy(globalsStationsHelper, 'getMatchingGlobalStations')
             const handleMatchingStationsSpy = sinon.spy(stationsHelperStub, 'handleMatchingStations')
             const removeFromGlobalStationSpy = sinon.spy(globalsStationsHelper, 'removeFromGlobalStations')
 
@@ -106,60 +111,31 @@ describe('test reset handler', () => {
                 'b',
                 searchStr])
 
-            assertRemoveOneStationFromMany(getMatchingStationsSpy,
-                searchStr, handleMatchingStationsSpy, bot, msg, myChatId, removeFromGlobalStationSpy,
-                globalStationsKeyboardAfter, sendMessageSpy);
-        })
-
-        it('when one global station exist, station name is given, and match existing, everything is deleted', () => {
-            const globalStationsKeyboardAfter = { dummy: 'dummy' }
-            const globalsStationsHelper = mockGetGlobalsStationsWithOneStation(globalStationsKeyboardAfter)
-            const stationsHelperStub = createStationsHelperStub([]);
-            const getMatchingStationsSpy = sinon.spy(stationsHelperStub, 'getMatchingStations')
-            const handleMatchingStationsSpy = sinon.spy(stationsHelperStub, 'handleMatchingStations')
-            const deleteGlobalStationsSpy = sinon.spy(globalsStationsHelper, 'deleteGlobalStations')
-
-            const searchStr = 'differentStation'
-            sut.handleCommandReset(bot, msg, [
-                'a',
-                'b',
-                searchStr])
-
-            assertRemoveAllAsOnlyOneGlobalStation(getMatchingStationsSpy,
-                searchStr, handleMatchingStationsSpy, bot, msg, myChatId,
-                deleteGlobalStationsSpy, globalStationsKeyboardAfter,
-                sendMessageSpy);
-        })
-
+            assertRemoveOneStation(getMatchingStationsSpy,
+                searchStr, matching, handleMatchingStationsSpy, bot, msg, myChatId, 
+                removeFromGlobalStationSpy, globalStationsKeyboardAfter, sendMessageSpy);
+        })     
     });
 });
 
-function assertRemoveOneStationFromMany(getMatchingStationsSpy,
-    searchStr, handleMatchingStationsSpy, bot, msg, myChatId, removeFromGlobalStationsSpy,
-    globalStationsKeyboardAfter, sendingMessageSpy) {
+function assertRemoveOneStation(getMatchingStationsSpy,
+    searchStr, matching, handleMatchingStationsSpy, bot, msg, myChatId, 
+    removeFromGlobalStationsSpy, globalStationsKeyboardAfter, sendingMessageSpy) {
     assertGetMatchingStationsCall(getMatchingStationsSpy, searchStr);
-    assertHandleMatchingStationsWithFunCall(handleMatchingStationsSpy, bot, msg, searchStr, myChatId,
-        sendingMessageSpy, removeFromGlobalStationsSpy, globalStationsKeyboardAfter);
+    assertHandleMatchingStationsWithFunCall(handleMatchingStationsSpy, bot, msg, searchStr,
+        matching, myChatId, sendingMessageSpy, removeFromGlobalStationsSpy, 
+        globalStationsKeyboardAfter);
 }
 
-function assertRemoveAllAsOnlyOneGlobalStation(getMatchingStationsSpy,
-    searchStr, handleMatchingStationsSpy, bot, msg, myChatId, deleteGlobalStations,
-    globalStationsKeyboardAfter, sendingMessageSpy) {
+function assertNoRemove(getMatchingStationsSpy, searchStr, matching, handleMatchingStationsSpy, 
+        bot, msg, removeFromGlobalStationSpy) {
     assertGetMatchingStationsCall(getMatchingStationsSpy, searchStr);
-    assertHandleMatchingStationsWithFunCallWhenOnlyOneExists(handleMatchingStationsSpy, bot, msg, searchStr, myChatId,
-        sendingMessageSpy, deleteGlobalStations, globalStationsKeyboardAfter);
-}
-
-function assertNoRemove(getMatchingStationsSpy, searchStr, handleMatchingStationsSpy, bot, msg,
-    removeFromGlobalStationSpy) {
-    assertGetMatchingStationsCall(getMatchingStationsSpy, searchStr);
-    assertHandleMatchingStations(handleMatchingStationsSpy, bot, msg, searchStr)
+    assertHandleMatchingStations(handleMatchingStationsSpy, bot, msg, searchStr, matching)
     expect(removeFromGlobalStationSpy.called).to.be.false
 }
 
-function createStationsHelperStub(matching) {
+function createStationsHelperStub() {
     const stationsHelperStub = {
-        getMatchingStations: () => matching.slice(0),
         handleMatchingStations: () => null
     };
     sut.__set__('stationsHelper', stationsHelperStub);
@@ -167,49 +143,32 @@ function createStationsHelperStub(matching) {
 }
 
 function assertHandleMatchingStationsWithFunCall(handleMatchingStationsSpy, bot, msg,
-    searchStr, myChatId, sendingMessageSpy, removeFromGlobalStationsSpy,
+    searchStr, matching, myChatId, sendingMessageSpy, removeFromGlobalStationsSpy,
     globalStationsKeyboardAfter) {
 
-    const funToCall = assertHandleMatchingStations(handleMatchingStationsSpy, bot, msg, searchStr);
+    const funToCall = assertHandleMatchingStations(handleMatchingStationsSpy, bot, msg, searchStr,
+        matching);
 
     funToCall(bot, msg, { name: 'exampleStation1' })
 
-    assertRemoveStationWithRemaining(removeFromGlobalStationsSpy, sendingMessageSpy,
+    assertRemoveStation(removeFromGlobalStationsSpy, sendingMessageSpy,
         globalStationsKeyboardAfter, myChatId);
 }
 
-function assertHandleMatchingStationsWithFunCallWhenOnlyOneExists(handleMatchingStationsSpy, bot, msg,
-    searchStr, myChatId, sendingMessageSpy, deleteGlobalStations,
-    globalStationsKeyboardAfter) {
-
-    const funToCall = assertHandleMatchingStations(handleMatchingStationsSpy, bot, msg, searchStr);
-
-    funToCall(bot, msg, { name: 'exampleStation1' })
-
-    assertRemoveStationWithoutRemaining(deleteGlobalStations, sendingMessageSpy,
-        globalStationsKeyboardAfter, myChatId);
-}
-
-function assertHandleMatchingStations(handleMatchingStationsSpy, bot, msg, searchStr) {
+function assertHandleMatchingStations(handleMatchingStationsSpy, bot, msg, searchStr, matching) {
     const call = handleMatchingStationsSpy.getCall(0);
     expect(call.args[0]).to.equal(bot);
     expect(call.args[1]).to.equal(msg);
-    assertPassedStations(call.args[2]);
+    expect(call.args[2]).to.equal(matching);
     expect(call.args[3]).to.equal(searchStr);
     const funToCall = call.args[4];
     return funToCall;
 }
 
-function assertRemoveStationWithRemaining(removeFromGlobalStationsSpy, sendingMessageSpy,
+function assertRemoveStation(removeFromGlobalStationsSpy, sendingMessageSpy,
     globalStationsKeyboardAfter, myChatId) {
     const removeCall = removeFromGlobalStationsSpy.getCall(0);
     expect(removeCall.args[0]).to.equal('exampleStation1');
-    assertDeleteConfirmation(sendingMessageSpy, myChatId, globalStationsKeyboardAfter);
-}
-
-function assertRemoveStationWithoutRemaining(deleteGlobalStationsSpy, sendingMessageSpy,
-    globalStationsKeyboardAfter, myChatId) {
-    expect(deleteGlobalStationsSpy.called).to.be.true;
     assertDeleteConfirmation(sendingMessageSpy, myChatId, globalStationsKeyboardAfter);
 }
 
@@ -222,15 +181,7 @@ function assertDeleteConfirmation(sendingMessageSpy, myChatId, globalStationsKey
 
 function assertGetMatchingStationsCall(getMatchingStationsSpy, searchStr) {
     const matchingCall = getMatchingStationsSpy.getCall(0);
-    const stations = matchingCall.args[0];
-    assertPassedStations(stations);
-    expect(matchingCall.args[1]).to.equal(searchStr);
-}
-
-function assertPassedStations(stations) {
-    //expect(stations.length).to.be.equal(2);
-    //expect(stations[0].name).to.be.equal('exampleStation1');
-    //expect(stations[1].name).to.be.equal('exampleStation2');
+    expect(matchingCall.args[0]).to.equal(searchStr);
 }
 
 function assertDontDeleteAllWhenRejected(queryListener, myChatId, callbackSpy,
@@ -297,29 +248,10 @@ function assertSecondDeletionQuery(sendMessageSpy, myChatId) {
         .equal({ text: 'NEIN  \u{1F631}', callback_data: 'noreset' });
 }
 
-function mockGetGlobalsStationsWithTwoStations(globalStationsKeyboardAfter) {
-    const exampleStation1 = 'exampleStation1';
-    const exampleStation2 = 'exampleStation2';
-    const global = [
-        exampleStation1,
-        exampleStation2
-    ]
+function mockGetGlobalsStations(empty, matching, globalStationsKeyboardAfter) {
     const globalStationsHelperStub = {
-        getGlobalStations: () => global.slice(0),
-        removeFromGlobalStations: () => null,
-        globalStationsAsKeyboard: () => globalStationsKeyboardAfter,
-        deleteGlobalStations: () => null
-    };
-    sut.__set__('globalStationsHelper', globalStationsHelperStub);
-    return globalStationsHelperStub
-}
-
-function mockGetGlobalsStationsWithOneStation(globalStationsKeyboardAfter) {
-    const exampleStation1 = 'exampleStation1';
-    const globalStationsHelperStub = {
-        getGlobalStations: () => [
-            exampleStation1
-        ].slice(0),
+        isEmpty: () => empty,
+        getMatchingGlobalStations: () => matching,
         removeFromGlobalStations: () => null,
         globalStationsAsKeyboard: () => globalStationsKeyboardAfter,
         deleteGlobalStations: () => null

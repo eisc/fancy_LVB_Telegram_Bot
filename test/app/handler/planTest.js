@@ -49,13 +49,13 @@ describe('test plan handler', () => {
             assertQueryForPlan(sendMessageSpy, myChatId);
             const queryListener = assertRegistrationOfSelectionListener(selectionSpy);
 
-            assertSendingTheRightDocument(queryListener, myChatId, callbackSpy, 
+            assertSendingTheRightDocument(queryListener, myChatId, callbackSpy,
                 sendActionSpy, sendDocSpy);
         })
     })
 })
 
-function assertSendingTheRightDocument(queryListener, myChatId, callbackSpy, 
+function assertSendingTheRightDocument(queryListener, myChatId, callbackSpy,
         sendActionSpy, sendDocSpy) {
     const query = {
         id: 'myQueryId',

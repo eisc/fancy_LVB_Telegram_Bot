@@ -13,7 +13,7 @@ exports.fetchAllStops = function(bot, msg) {
             result => {
                 const retrievedStops = result.json()
                 gtfsCache.set(stopKey, retrievedStops)
-                return retrievedStops 
+                return retrievedStops
             }
         )
     } catch (error) {

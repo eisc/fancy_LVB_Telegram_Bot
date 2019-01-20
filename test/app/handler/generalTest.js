@@ -26,7 +26,7 @@ describe('test handleCommandStart and handleCommandHelp', () => {
 
     describe('test handleCommandStart', () => {
       const fromName = 'Hans'
-      
+
       beforeEach(() => {
         msg = {
           ...msg,
@@ -35,16 +35,16 @@ describe('test handleCommandStart and handleCommandHelp', () => {
           }
         };
       });
-  
+
       it('should send expected personalized welcome message', () => {
         handleCommandStart(bot, msg)
         const call = sendMessageSpy.getCall(0);
         expect(call.args[0]).to.equal(myChatId);
         expect(call.args[1].startsWith('Hallo ' + msg.from.first_name)).to.be.true;
         expect(call.args[1].includes('helfe dir gerne bei den Abfahrtszeiten')).to.be.true;
-        expect(call.args[1].includes('Bei /help werden dir alle Funktionen ' 
+        expect(call.args[1].includes('Bei /help werden dir alle Funktionen '
           + 'dieses Bots aufgelistet')).to.be.true;
-      });      
+      });
     });
 
     describe('test handleCommandHelp', () => {
@@ -60,6 +60,6 @@ describe('test handleCommandStart and handleCommandHelp', () => {
         expect(call.args[1].includes('Mit /add ')).to.be.true;
         expect(call.args[1].includes('Mit /station ')).to.be.true;
         expect(call.args[1].includes('Mit /reset ')).to.be.true;
-      });      
-    });    
+      });
+    });
 });

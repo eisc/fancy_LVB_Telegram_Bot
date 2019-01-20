@@ -1,18 +1,36 @@
-let globalStations = []
+const commonStationHelper = require('./commonstations')
+const globalStations = []
 
-exports.getGlobalStations = function () {
-    return globalStations;
+exports.isEmpty = function () {
+    return globalStations.length === 0;
 }
 
-exports.addGlobalStation = function (name) {
-    if(globalStations.indexOf(name) === -1) {
-        globalStations.push(name)
+exports.getMatchingGlobalStations = function (stationName) {
+    return commonStationHelper.getMatchingStations(globalStations, stationName)
+}
+
+exports.addGlobalStation = function (station) {
+    if(!containedInGlobalStations(station)) {
+        globalStations.push(station)
     }
 }
 
+function getGlobalStationIds() {
+    return globalStations.map(globalStation => globalStation.id)
+}
+
+function containedInGlobalStations(station) {
+    return getGlobalStationIds().indexOf(station.id) !== -1
+}
+exports.containedInGlobalStations = containedInGlobalStations;
+
 exports.removeFromGlobalStations = function(station) {
-    if(globalStations.indexOf(station) !== -1) {
-        globalStations.splice(globalStations.indexOf(station), 1)
+    if(containedInGlobalStations(station)) {
+        if(globalStations.length === 1) {
+            globalStations.length = 0
+        } else {
+            globalStations.splice(globalStations.indexOf(station), 1)
+        }
     }
 }
 
@@ -23,7 +41,7 @@ exports.deleteGlobalStations = function () {
 exports.globalStationsAsKeyboard = function () {
     return {
         reply_markup: {
-            keyboard: [globalStations],
+            keyboard: commonStationHelper.transformToSelectableStationNames(globalStations),
             resize_keyboard: true
         }
     }

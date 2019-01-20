@@ -2,10 +2,10 @@ const expect = require('chai').expect;
 const sinon = require('sinon');
 const rewire = require('rewire');
 const sut = rewire('../../../app/helper/departure.js');
-/* eslint no-underscore-dangle: ["error", { "allow": ["__get__"] }] */
+/* eslint no-underscore-dangle: ["error", { "allow": ["__get__", "__set__"] }] */
+const handleDeparture = sut.handleDeparture
 const handleDepartureTime = sut.__get__('handleDepartureTime')
 const createAnswerForDepartureResult = sut.__get__('createAnswerForDepartureResult')
-const handleDeparture = sut.__get__('handleDeparture')
 
 describe('test departure calculation', () => {
 
@@ -38,8 +38,17 @@ describe('test departure calculation', () => {
             const answer = handleDepartureTime(time)
             const expectedAnswer = '- um 21:33 mit einer Verspätung von 1 Minute\n'
             expect(answer).to.equal(expectedAnswer)
-        });        
+        });
 
+        it('should suppress delay when lower than one minute delay', () => {
+            const time = {
+                departure: '2018-12-25T21:33:15.050+0100',
+                departureDelay: 50000
+            };
+            const answer = handleDepartureTime(time)
+            const expectedAnswer = '- um 21:33\n'
+            expect(answer).to.equal(expectedAnswer)
+        });
     });
 
     describe('test createAnswerForDepartureResult', () => {
@@ -66,11 +75,10 @@ describe('test departure calculation', () => {
             };
             const answer = createAnswerForDepartureResult(station, result)
             const expectedAnswer = 'Abfahrt ab ' + stationName + ' von ' + lineName
-                + ' in Richtung ' + lineDirection + '\n' 
+                + ' in Richtung ' + lineDirection + '\n'
                 + '- Keine Abfahrtszeiten verfügbar'
             expect(answer).to.equal(expectedAnswer)
-        });   
-        
+        });
 
         it('should send departure infos according to time table', () => {
             const stationName = 'MyStation'
@@ -82,19 +90,19 @@ describe('test departure calculation', () => {
             const result = getResult1(lineName, lineDirection);
             const answer = createAnswerForDepartureResult(station, result)
             const expectedAnswer = 'Abfahrt ab ' + stationName + ' von ' + lineName
-                + ' in Richtung ' + lineDirection + '\n' 
+                + ' in Richtung ' + lineDirection + '\n'
                 + '- um 21:33 mit einer Verspätung von 3 Minuten\n'
                 + '- um 21:50\n'
             expect(answer).to.equal(expectedAnswer)
-        });         
-    });    
+        });
+    });
 
     describe('test handleDeparture', () => {
         var bot = null;
         var sendMessageSpy = null;
         var msg = null;
         const myChatId = 'myChatId'
-    
+
         beforeEach(() => {
           bot = {
             sendMessage: () => null
@@ -106,16 +114,16 @@ describe('test departure calculation', () => {
             }
           };
         });
-    
+
         afterEach(() => {
             sinon.restore()
-        });    
+        });
 
         it('should handle missing departures', () => {
             const stationName = 'MyStation'
             const station = {
                 name: stationName
-            };            
+            };
             const departureResults = []
             handleDeparture(bot, msg, station, departureResults)
 
@@ -130,7 +138,7 @@ describe('test departure calculation', () => {
             };
             const result1 = getResult1('MyLine1', 'MyLineDirection1');
             const result2 = getResult2('MyLine2', 'MyLineDirection2');
-            const departureResults = [ 
+            const departureResults = [
                 result1,
                 result2
             ];
@@ -183,7 +191,7 @@ describe('test departure calculation', () => {
             + '- um 21:55\n';
         expect(call2.args[1]).eq(expectedAnswer2);
     }
-    
+
     function assertAnswer1(sendMessageSpy, myChatId) {
         const call1 = sendMessageSpy.getCall(0);
         expect(call1.args[0]).to.equal(myChatId);
@@ -193,5 +201,5 @@ describe('test departure calculation', () => {
             + '- um 21:50\n';
         expect(call1.args[1]).eq(expectedAnswer1);
         return { call1, expectedAnswer1 };
-    }    
+    }
 });

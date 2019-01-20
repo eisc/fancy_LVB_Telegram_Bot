@@ -67,12 +67,14 @@ describe('test helper module gtfs', () => {
             sut.__set__('fetch', fetchFake)
 
             const gtfsCacheGetStub = sinon.stub(gtfsCacheStub, 'get')
+            gtfsCacheGetStub.returns(jsonContent)
 
             const result = sut.fetchAllStops(bot, msg)
 
             result.then((content) => {
                 expect(content).to.equal(jsonContent);
                 assertCacheGetInteraction(gtfsCacheGetStub)
+                expect(fetchFake.getCall(0)).to.be.null
                 done();
             });
         })

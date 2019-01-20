@@ -1,6 +1,6 @@
 const gtfsHelper = require('../helper/gtfs')
 const stationsHelper = require('../helper/stations')
-const departureHelper = require('../helper/departure')
+const departureHelper = require('../helper/departure_lvb')
 
 exports.handlePotentialStation = function (bot, msg, match) {
     gtfsHelper.fetchAllStops().then(data => {

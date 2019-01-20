@@ -1,9 +1,7 @@
-exports.getMatchingStations = function (stations, charSequence) {
-    return stations.filter(stop => stationIncludesStringInName(stop, charSequence))
-}
+const commonStationHelper = require('./commonstations')
 
-function stationIncludesStringInName(station, charSequence) {
-    return station.name.toLowerCase().includes(charSequence.toLowerCase())
+exports.getMatchingStations = function (stations, charSequence) {
+    return commonStationHelper.getMatchingStations(stations, charSequence)
 }
 
 exports.handleMatchingStations = function (bot, msg, stations, requestString,
@@ -20,7 +18,7 @@ exports.handleMatchingStations = function (bot, msg, stations, requestString,
 }
 
 function handleMultipleMatchingStations(bot, msg, stations, handleMatchingStationFun) {
-    const selectableStationNames = transformToSelectableStationNames(stations);
+    const selectableStationNames = commonStationHelper.transformToSelectableStationNames(stations);
     bot.sendMessage(msg.chat.id,
         `Meintest du eine dieser ${selectableStationNames.length} Haltestellen?`,
         offerMatchingStationsForSelection(selectableStationNames));
@@ -47,10 +45,4 @@ function noStationsFound(stations) {
 
 function tooManyStationsFound(stations) {
     return stations.length >= 11;
-}
-
-function transformToSelectableStationNames(stations) {
-    return stations.map(station => {
-        return [{ text: station.name, callback_data: station.id }];
-    });
 }
