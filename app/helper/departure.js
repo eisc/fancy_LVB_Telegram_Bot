@@ -4,10 +4,21 @@ var table = require('text-table')
 
 exports.handleDeparture = function (bot, msg, station, departureResults) {
     if (departureResults.length) {
-            var answer = createAnswerForDepartureResult(station, departureResults).slice(0, 11);
-            bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer)}${"`"}`, { parse_mode: 'Markdown' })
+            var answer = createAnswerForDepartureResult(station, departureResults).slice(0, 10)
+            bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer)}${"`"}`,
+            { parse_mode: 'Markdown',
+              reply_markup: {
+                inline_keyboard: [[{ text: 'mehr anzeigen', callback_data: 'more' }]]
+              } })
+              bot.once('callback_query', query => {
+                bot.answerCallbackQuery(query.id)
+                if (query.data === 'more') {
+                  var answer = createAnswerForDepartureResult(station, departureResults).slice(0, 20)
+                  bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer)}${"`"}`, { parse_mode: 'Markdown' })
+                }
+              })
     } else {
-        bot.sendMessage(msg.chat.id, `Keine aktuellen Abfahrten für *${station.name}* gefunden.`, { parse_mode: 'Markdown' })
+      bot.sendMessage(msg.chat.id, `Keine aktuellen Abfahrten für *${station.name}* gefunden.`, { parse_mode: 'Markdown' })
     }
 }
 
