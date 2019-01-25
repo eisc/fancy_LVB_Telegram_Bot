@@ -1,50 +1,41 @@
 const moment = require('moment')
+var table = require('text-table')
+
 
 exports.handleDeparture = function (bot, msg, station, departureResults) {
     if (departureResults.length) {
-        departureResults.forEach(res => {
-            const answer = createAnswerForDepartureResult(station, res);
-            bot.sendMessage(msg.chat.id, answer)
-        })
+            var answer = createAnswerForDepartureResult(station, departureResults).slice(0, 11);
+            bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer)}${"`"}`, { parse_mode: 'Markdown' })
     } else {
-        bot.sendMessage(msg.chat.id, 'Keine aktuellen Abfahrten gefunden für ' + station.name)
+        bot.sendMessage(msg.chat.id, `Keine aktuellen Abfahrten für *${station.name}* gefunden.`, { parse_mode: 'Markdown' })
     }
 }
 
-function createAnswerForDepartureResult(station, res) {
-    if (res.line) {
-        var answer = `Abfahrt ab ${station.name} von ${res.line.name} in Richtung ${res.line.direction}\n`
-        if (res.timetable) {
-            res.timetable.forEach(time => {
-                answer += handleDepartureTime(time)
-            })
-        } else {
-            answer += '- Keine Abfahrtszeiten verfügbar'
-        }
-        return answer
-    }
-    return 'Keine Linieninformationen verfügbar'
+function createAnswerForDepartureResult(station, departureResults) {
+var departure = []
+departureResults.forEach(res => {
+  res.timetable.forEach(time => {
+    departure.push([res.line.name.substring(res.line.name.length - 3, res.line.name.length),
+    res.line.direction,
+    handleDepartureTime(time),
+    handleDelay(time)])
+  })
+})
+departure.sort((entry1, entry2) => entry1[2] - entry2[2])
+return departure
 }
 
 function handleDepartureTime(time) {
     const depTime = new Date(Date.parse(time.departure))
-    const departureStr = moment(depTime).format('HH:mm')
-    var answer = `- um ${departureStr}`
-    if (time.departureDelay !== 0) {
-        answer += handleDelay(time);
-    }
-    answer += '\n'
-    return answer
+    var departureInMinutes = Math.floor(moment.duration(moment(depTime).diff(moment())).as('minutes'))
+    return departureInMinutes
 }
 
 function handleDelay(time) {
     const delay = new Date(time.departureDelay);
     const delayMinutes = delay.getMinutes();
     if (delayMinutes > 0) {
-        const ending = delayMinutes > 1
-            ? 'n'
-            : '';
-        return ` mit einer Verspätung von ${delayMinutes} Minute${ending}`;
+        return ` +${delayMinutes}`;
     }
     return '';
 }

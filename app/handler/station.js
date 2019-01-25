@@ -10,7 +10,6 @@ exports.handlePotentialStation = function (bot, msg, match) {
 }
 
 function handleMatchingStation (bot, msg, station) {
-    bot.sendMessage(msg.chat.id, `Das sind die nächsten Abfahrten für ${station.name}:`)
     departureHelper.getDeparturesForStation(bot, msg, station);
 }
 exports.handleMatchingStation = handleMatchingStation;
