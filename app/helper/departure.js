@@ -5,7 +5,7 @@ var table = require('text-table')
 exports.handleDeparture = function (bot, msg, station, departureResults) {
     if (departureResults.length) {
             var answer = createAnswerForDepartureResult(station, departureResults).slice(0, 10)
-            bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer)}${"`"}`,
+            bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer, { align: ['r', 'l', 'r'] })}${"`"}`,
             { parse_mode: 'Markdown',
               reply_markup: {
                 inline_keyboard: [[{ text: 'mehr anzeigen', callback_data: 'more' }]]
@@ -14,7 +14,7 @@ exports.handleDeparture = function (bot, msg, station, departureResults) {
                 bot.answerCallbackQuery(query.id)
                 if (query.data === 'more') {
                   var answer = createAnswerForDepartureResult(station, departureResults).slice(0, 20)
-                  bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer)}${"`"}`, { parse_mode: 'Markdown' })
+                  bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer, { align: ['r', 'l', 'r'] })}${"`"}`, { parse_mode: 'Markdown' })
                 }
               })
     } else {
@@ -26,7 +26,7 @@ function createAnswerForDepartureResult(station, departureResults) {
 var departure = []
 departureResults.forEach(res => {
   res.timetable.forEach(time => {
-    departure.push([res.line.name.substring(res.line.name.length - 3, res.line.name.length),
+    departure.push([res.line.id,
     res.line.direction,
     handleDepartureTime(time),
     handleDelay(time)])
@@ -39,14 +39,17 @@ return departure
 function handleDepartureTime(time) {
     const depTime = new Date(Date.parse(time.departure))
     var departureInMinutes = Math.floor(moment.duration(moment(depTime).diff(moment())).as('minutes'))
+    if (departureInMinutes === 0) {
+      return ''
+    }
     return departureInMinutes
 }
 
 function handleDelay(time) {
-    const delay = new Date(time.departureDelay);
-    const delayMinutes = delay.getMinutes();
+    const delay = new Date(time.departureDelay)
+    const delayMinutes = delay.getMinutes()
     if (delayMinutes > 0) {
-        return ` +${delayMinutes}`;
+        return ` +${delayMinutes}`
     }
-    return '';
+    return ''
 }
