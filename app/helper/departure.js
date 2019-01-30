@@ -8,11 +8,12 @@ exports.handleDeparture = function (bot, msg, station, departureResults) {
             bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer, { align: ['r', 'l', 'r'] })}${"`"}`,
             { parse_mode: 'Markdown',
               reply_markup: {
-                inline_keyboard: [[{ text: 'mehr anzeigen', callback_data: 'more' }]]
+                inline_keyboard: [[{ text: 'mehr anzeigen', callback_data: station.id }]]
               } })
-              bot.once('callback_query', query => {
+              bot.on('callback_query', query => {
                 bot.answerCallbackQuery(query.id)
-                if (query.data === 'more') {
+                console.log(station.id);
+                if (query.data === station.id) {
                   var answer = createAnswerForDepartureResult(station, departureResults).slice(0, 20)
                   bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer, { align: ['r', 'l', 'r'] })}${"`"}`, { parse_mode: 'Markdown' })
                 }
