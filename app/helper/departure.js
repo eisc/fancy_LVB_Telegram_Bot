@@ -1,5 +1,6 @@
 const moment = require('moment')
-var table = require('text-table')
+const table = require('text-table')
+var fixedDate = null
 
 exports.handleDeparture = function (bot, msg, station, departureResults) {
   if (departureResults.length) {
@@ -98,23 +99,25 @@ function compareDepartureEntries(entry1, entry2) {
 }
 
 function compareStrings(string1, string2, nextCompareFun) {
-  if(string1 === string2) {
+  const compareResult = string1.localeCompare(string2);
+  if(compareResult === 0) {
     return nextCompareFun();
   }
-  return string1.localeCompare(string2);
+  return compareResult;
 }
 
 function compareDepartures(departure1, delay1, departure2, delay2, nextCompareFun) {
   const totalDeparture1 = totalDeparture(departure1, delay1)
   const totalDeparture2 = totalDeparture(departure2, delay2)
-  if(totalDeparture1 === totalDeparture2) {
+  const compareResult = totalDeparture1 - totalDeparture2;
+  if(compareResult === 0) {
     return nextCompareFun();
   }
-  return departure1 - departure2
+  return compareResult
 }
 
 function totalDeparture(departure, delay) {
-  return convertNumberStr(departure) + convertNumberStr(delay)
+  return departure + convertNumberStr(delay)
 }
 
 function convertNumberStr(delayStr) {
@@ -125,7 +128,7 @@ function convertNumberStr(delayStr) {
 
 function handleDepartureTime(time) {
     const depTime = new Date(Date.parse(time.departure))
-    const diffToNow = moment(depTime).diff(moment())
+    const diffToNow = moment(depTime).diff(referenceTime())
     const diffInMinutes = moment.duration(diffToNow).as('minutes')
     var departureInMinutes = Math.floor(diffInMinutes)
     return departureInMinutes === 0 
@@ -133,11 +136,19 @@ function handleDepartureTime(time) {
       : departureInMinutes
 }
 
+function referenceTime() {
+  return fixedDate 
+    ? fixedDate
+    : moment();
+}
+
 function handleDelay(time) {
-    const delay = new Date(time.departureDelay)
-    const delayMinutes = delay.getMinutes()
-    if (delayMinutes > 0) {
-        return ` +${delayMinutes}`
+    const delayMinutes = Math.floor(time.departureDelay / 60000);
+    if (delayMinutes === 0) {
+      return ''
     }
-    return ''
+    const sign = delayMinutes > 0
+      ? '+'
+      : '';
+    return ` ${sign}${delayMinutes}`
 }

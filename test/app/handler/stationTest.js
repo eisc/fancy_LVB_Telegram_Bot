@@ -85,9 +85,6 @@ function assertMembersOfChainAreCalled(dataPromise, getMatchingStationsSpy, stat
 
 function assertPassedFunctionCall(sendMessageSpy, myChatId, getDeparturesForStationSpy, bot,
         msg, matchingStations) {
-    const botCall = sendMessageSpy.getCall(0);
-    expect(botCall.args[0]).to.be.equal(myChatId);
-    expect(botCall.args[1]).to.be.equal('Das sind die nächsten Abfahrten für myStationName 1:');
     const departCall = getDeparturesForStationSpy.getCall(0);
     expect(departCall.args[0]).to.be.equal(bot);
     expect(departCall.args[1]).to.be.equal(msg);

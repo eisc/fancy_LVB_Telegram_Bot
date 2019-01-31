@@ -1,42 +1,66 @@
 const expect = require('chai').expect;
 const sinon = require('sinon');
 const rewire = require('rewire');
+const moment = require('moment')
 const sut = rewire('../../../app/helper/departure.js');
 /* eslint no-underscore-dangle: ["error", { "allow": ["__get__", "__set__"] }] */
 const handleDeparture = sut.handleDeparture
 const handleDepartureTime = sut.__get__('handleDepartureTime')
+const handleDelay = sut.__get__('handleDelay')
+const compareDepartures = sut.__get__('compareDepartures')
 const createAnswerForDepartureResult = sut.__get__('createAnswerForDepartureResult')
 
 describe('test departure calculation', () => {
 
+    beforeEach(() => {
+        sut.__set__('fixedDate', moment('2018-12-25T21:31:43.000+0100'))
+    })
+
+    afterEach(() => {
+        sut.__set__('fixedDate', null)
+    })
+
     describe('test handleDepartureTime', () => {
-        it('should send answer without delay included, when delay is 0', () => {
+        it('should send diff in minutes to reference date', () => {
             const time = {
                 departure: '2018-12-25T21:33:15.050+0100',
                 departureDelay: 0
             };
             const answer = handleDepartureTime(time)
-            const expectedAnswer = '- um 21:33\n'
+            const expectedAnswer = 1
             expect(answer).to.equal(expectedAnswer)
         });
+
+        it('should send empty string, when diff to reference date is lower 1', () => {
+            const time = {
+                departure: '2018-12-25T21:32:00.000+0100',
+                departureDelay: 0
+            };
+            const answer = handleDepartureTime(time)
+            const expectedAnswer = ''
+            expect(answer).to.equal(expectedAnswer)
+        });
+
+        it('should send negative number, when departure is in past', () => {
+            const time = {
+                departure: '2018-12-25T21:30:00.000+0100',
+                departureDelay: 0
+            };
+            const answer = handleDepartureTime(time)
+            const expectedAnswer = -2
+            expect(answer).to.equal(expectedAnswer)
+        });
+    });
+
+    describe('test handleDelay', () => {
 
         it('should send answer with delay included, when delay is greater 0', () => {
             const time = {
                 departure: '2018-12-25T21:33:15.050+0100',
                 departureDelay: 180000
             };
-            const answer = handleDepartureTime(time)
-            const expectedAnswer = '- um 21:33 mit einer Verspätung von 3 Minuten\n'
-            expect(answer).to.equal(expectedAnswer)
-        });
-
-        it('should send "Minute" instead of "Minutes" when only one minute delay', () => {
-            const time = {
-                departure: '2018-12-25T21:33:15.050+0100',
-                departureDelay: 60000
-            };
-            const answer = handleDepartureTime(time)
-            const expectedAnswer = '- um 21:33 mit einer Verspätung von 1 Minute\n'
+            const answer = handleDelay(time)
+            const expectedAnswer = ' +3'
             expect(answer).to.equal(expectedAnswer)
         });
 
@@ -45,16 +69,26 @@ describe('test departure calculation', () => {
                 departure: '2018-12-25T21:33:15.050+0100',
                 departureDelay: 50000
             };
-            const answer = handleDepartureTime(time)
-            const expectedAnswer = '- um 21:33\n'
+            const answer = handleDelay(time)
+            const expectedAnswer = ''
+            expect(answer).to.equal(expectedAnswer)
+        });
+
+        it('should send answer with delay included, when delay is lower 0', () => {
+            const time = {
+                departure: '2018-12-25T21:33:15.050+0100',
+                departureDelay: -180000
+            };
+            const answer = handleDelay(time)
+            const expectedAnswer = ' -3'
             expect(answer).to.equal(expectedAnswer)
         });
     });
-
+        
     describe('test createAnswerForDepartureResult', () => {
         it('should send no line info available message, when line not defined', () => {
             const station = {};
-            const result = {};
+            const result = [];
             const answer = createAnswerForDepartureResult(station, result)
             const expectedAnswer = 'Keine Linieninformationen verfügbar'
             expect(answer).to.equal(expectedAnswer)
@@ -67,12 +101,13 @@ describe('test departure calculation', () => {
             };
             const lineName = 'MyLine'
             const lineDirection = 'MyLineDirection'
-            const result = {
+            const result = [{
                 line: {
                     name: lineName,
                     direction: lineDirection
-                }
-            };
+                },
+                timetable: []
+            }];
             const answer = createAnswerForDepartureResult(station, result)
             const expectedAnswer = 'Abfahrt ab ' + stationName + ' von ' + lineName
                 + ' in Richtung ' + lineDirection + '\n'
@@ -87,7 +122,7 @@ describe('test departure calculation', () => {
             };
             const lineName = 'MyLine'
             const lineDirection = 'MyLineDirection'
-            const result = getResult1(lineName, lineDirection);
+            const result = [getResult1(lineName, lineDirection)];
             const answer = createAnswerForDepartureResult(station, result)
             const expectedAnswer = 'Abfahrt ab ' + stationName + ' von ' + lineName
                 + ' in Richtung ' + lineDirection + '\n'
@@ -137,7 +172,7 @@ describe('test departure calculation', () => {
                 name: 'MyStation'
             };
             const result1 = getResult1('MyLine1', 'MyLineDirection1');
-            const result2 = getResult2('MyLine2', 'MyLineDirection2');
+            const result2 = getResult2('MyLine2', '>MyLineDirection2');
             const departureResults = [
                 result1,
                 result2
