@@ -19,6 +19,6 @@ function handleMatchingStation(bot, msg, station) {
   } else {
     globalStationsHelper.addGlobalStation(station);
     bot.sendMessage(msg.chat.id, `${station.name} wurde hinzugefügt.`,
-      globalStationsHelper.globalStationsAsKeyboard())
+    globalStationsHelper.globalStationsAsKeyboard())
   }
 }
