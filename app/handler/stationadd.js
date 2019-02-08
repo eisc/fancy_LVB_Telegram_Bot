@@ -1,4 +1,4 @@
-const gtfsHelper = require('../helper/gtfs')
+const lvb = require('lvb')
 const stationsHelper = require('../helper/stations')
 const globalStationsHelper = require('../helper/globalstations')
 
@@ -7,10 +7,7 @@ exports.handleCommandAdd = function (bot, msg, match) {
     bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
     return
   }
-  gtfsHelper.fetchAllStops().then(data => {
-    const matchingStations = stationsHelper.getMatchingStations(data, match[2])
-    return Promise.resolve(matchingStations)
-  }).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[2], handleMatchingStation))
+  lvb.stations(match[2]).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[2], handleMatchingStation))
 }
 
 function handleMatchingStation(bot, msg, station) {
