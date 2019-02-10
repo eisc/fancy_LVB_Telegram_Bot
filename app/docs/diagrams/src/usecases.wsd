@@ -1,0 +1,19 @@
+@startuml use cases
+usecase "Begrüßung \nanzeigen" as UC01
+usecase "Hilfe \n anzeigen" as UC02
+usecase "Linienpläne \nanzeigen" as UC03
+usecase "Haltestelle zu \nSchnellwahlliste \nhinzufügen" as UC04
+usecase "Haltestelle(n) aus \nSchnellwahlliste \nentfernen" as UC05
+usecase "5 nächstliegende \nHaltestellen für die \naktuelle GPS Position \nanzeigen" as UC06
+usecase "Abfahrten für \neine Haltestelle \nanzeigen" as UC07
+
+actor "Telegram Benutzer" as User
+
+User --> UC01
+User --> UC02
+User --> UC03
+User --> UC04
+User --> UC05
+User --> UC06
+User --> UC07
+@enduml

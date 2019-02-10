@@ -30,9 +30,9 @@ describe('test departure', () => {
 
     beforeEach(() => {
       bot = {
-      sendMessage: () => null,
-      once: () => null,
-      answerCallbackQuery: () => null
+        sendMessage: () => null,
+        once: () => null,
+        answerCallbackQuery: () => null
       };
       sendMessageSpy = sinon.spy(bot, 'sendMessage');
       msg = {
