@@ -1,3 +1,11 @@
+const extraLeipzigAreaStations = [
+    "Markkleeberg, Forsthaus Raschwitz",
+    "Gundorf, Friedhof",
+    "Taucha (b. Leipzig), Am Obstgut",
+    "Markkleeberg, Cospudener See/Erlebnisachse",
+    "Markkleeberg, Cospudener See/Nordstrand",
+    "Zum Dölitzer Schacht"
+]
 var currentContext = null
 
 exports.handleContext = function (bot, msg, match) {
@@ -24,10 +32,11 @@ exports.isInCurrentContext = function (station) {
   if(!currentContext) {
     return true
   } else if(currentContext === 'Leipzig' 
-      && (station.name.startsWith('Leipzig,') || station.name.startsWith('Leipzig-'))) {
-        return true;
+      && (station.name.startsWith('Leipzig,') 
+        || station.name.startsWith('Leipzig-')
+        || extraLeipzigAreaStations.indexOf(station.name) !== -1
+    )) {
+    return true;
   }
   return false;
 }
-
-  
