@@ -6,14 +6,17 @@ exports.normalizeStationId = function (stationId) {
 }
 
 exports.normalizeStationName = function (station) {
-  if (station.name.startsWith('Leipzig,')) {
+  if (station.name.startsWith('Leipzig,') 
+      || station.name.startsWith('Leipzig-')
+      || station.name.startsWith('Leipzig ')) {
     return station.name.substring(9)
   }
   return station.name
 }
 
-exports.getMatchingStations = function (stations, charSequence) {
+exports.getMatchingStations = function (stations, charSequence, contextResolver) {
   return stations.filter(stop => stationIncludesStringInName(stop, charSequence))
+    .filter(stop => contextResolver(stop))
 }
 
 function stationIncludesStringInName (station, charSequence) {

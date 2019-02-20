@@ -1,7 +1,7 @@
 const commonStationHelper = require('./commonstations')
 
-exports.getMatchingStations = function (stations, charSequence) {
-  return commonStationHelper.getMatchingStations(stations, charSequence)
+exports.getMatchingStations = function (stations, charSequence, contextResolver) {
+  return commonStationHelper.getMatchingStations(stations, charSequence, contextResolver)
 }
 
 exports.handleMatchingStations = function (bot, msg, stations, requestString,
