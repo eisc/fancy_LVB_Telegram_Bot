@@ -1,8 +1,8 @@
 const commonStationHelper = require('./commonstations')
 const globalStations = []
 
-exports.isEmpty = function () {
-  return globalStations.length === 0;
+exports.globalStationsLength = function () {
+  return globalStations.length
 }
 
 exports.getMatchingGlobalStations = function (stationName) {
@@ -24,19 +24,23 @@ function containedInGlobalStations(station) {
 }
 exports.containedInGlobalStations = containedInGlobalStations;
 
-exports.removeFromGlobalStations = function(station) {
-  if(containedInGlobalStations(station)) {
-    if(globalStations.length === 1) {
-      globalStations.length = 0
-    } else {
-      globalStations.splice(globalStations.indexOf(station), 1)
+exports.removeFromGlobalStations = function (station) {
+  globalStations.splice(globalStations.indexOf(station), 1)
+}
+
+function deleteGlobalStations() {
+  globalStations.length = 0
+}
+exports.deleteGlobalStations = deleteGlobalStations
+
+function removeKeyboard() {
+  return {
+    reply_markup: {
+      remove_keyboard: true
     }
   }
 }
-
-exports.deleteGlobalStations = function () {
-  globalStations.length = 0
-}
+exports.removeKeyboard = removeKeyboard
 
 exports.globalStationsAsKeyboard = function () {
   return {
