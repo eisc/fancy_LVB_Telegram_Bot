@@ -1,5 +1,6 @@
 const gtfsHelper = require('../helper/gtfs')
 const stationHelper = require('./station')
+const commonStationsHelper = require('../helper/commonstations')
 
 exports.handleCommandLocation = function (bot, msg) {
   gtfsHelper.fetchAllStops().then(data => {
@@ -9,8 +10,6 @@ exports.handleCommandLocation = function (bot, msg) {
   })
   dataWithDistance = dataWithDistance.sort((entry1, entry2) => entry1.distance - entry2.distance)
   const selection = dataWithDistance.slice(0, 5)
-  // console.log(msg.location);
-  // console.log(selection);
   const stationNames = selection.map(station => {
     return [{ text: station.name + ` (${Math.round(station.distance)}m)`, callback_data: station.id }]
   })

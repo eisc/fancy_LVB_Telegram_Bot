@@ -22,7 +22,7 @@ function handleMultipleMatchingStations(bot, msg, stations, handleMatchingStatio
   bot.sendMessage(msg.chat.id,
     `Meintest du eine dieser ${selectableStationNames.length} Haltestellen?`,
     offerMatchingStationsForSelection(selectableStationNames));
-  bot.once('callback_query', query => {
+  bot.on('callback_query', query => {
     const station = stations.find(station => station.id === query.data);
     bot.answerCallbackQuery(query.id);
     if (station) {
