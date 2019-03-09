@@ -26,7 +26,6 @@ exports.fetchAllStops = function(bot, msg) {
 exports.fetchDeparture = function(bot, msg, stopId) {
   try {
     const now = moment().format('YYYYMMDD')
-    console.log(`https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops/${stopId}/stoptimes/${now}`)
     return fetch(`https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops/${stopId}/stoptimes/${now}`).then(response => {
       return response.text()
     }).then(result => {

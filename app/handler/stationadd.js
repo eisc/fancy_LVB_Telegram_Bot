@@ -1,6 +1,7 @@
-const lvb = require('lvb')
+const gtfsHelper = require('../helper/gtfs')
 const stationsHelper = require('../helper/stations')
 const globalStationsHelper = require('../helper/globalstations')
+const commonStationsHelper = require('../helper/commonstations')
 
 function defaultContextFun() { 
   return true 
@@ -13,7 +14,14 @@ exports.handleCommandAdd = function (bot, msg, match, isInCurrentContext) {
     return
   }
   currentContextFun = isInCurrentContext
-  lvb.stations(match[2]).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[2], handleMatchingStation))
+  gtfsHelper.fetchAllStops().then(data => {
+    const matchingStations = stationsHelper.getMatchingStations(data, match[0], currentContextFun)
+    const formattedStations = matchingStations.map(station => {
+      station.name = commonStationsHelper.normalizeStationName(station)
+      return station
+    })
+    return Promise.resolve(formattedStations)
+  }).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))
 }
 
 function handleMatchingStation(bot, msg, station) {
