@@ -34,6 +34,7 @@ exports.isInCurrentContext = function (station) {
   } else if(currentContext === 'Leipzig' 
       && (station.name.startsWith('Leipzig,') 
         || station.name.startsWith('Leipzig-')
+        || station.name.startsWith('Leipzig ')
         || extraLeipzigAreaStations.indexOf(station.name) !== -1
     )) {
     return true;
