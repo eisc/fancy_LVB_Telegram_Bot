@@ -6,10 +6,11 @@ exports.normalizeStationId = function (stationId) {
 }
 
 exports.normalizeStationName = function (station) {
-  if (station.name.startsWith('Leipzig,') 
-      || station.name.startsWith('Leipzig-')
-      || station.name.startsWith('Leipzig ')) {
+  if (station.name.startsWith('Leipzig,')) {
     return station.name.substring(9)
+  } else if (station.name.startsWith('Leipzig-')
+      || station.name.startsWith('Leipzig ')) {
+    return station.name.substring(8)
   }
   return station.name
 }

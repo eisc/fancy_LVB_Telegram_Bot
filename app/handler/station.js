@@ -1,6 +1,7 @@
 const gtfsHelper = require('../helper/gtfs')
 const stationsHelper = require('../helper/stations')
-const departureHelper = require('../helper/departure_lvb')
+const departureLvbHelper = require('../helper/departure_lvb')
+const departureGtfsHelper = require('../helper/departure_gtfs')
 const commonStationsHelper = require('../helper/commonstations')
 
 exports.handlePotentialStation = function (bot, msg, match, contextResolver) {
@@ -15,6 +16,10 @@ exports.handlePotentialStation = function (bot, msg, match, contextResolver) {
 }
 
 function handleMatchingStation (bot, msg, station) {
-  departureHelper.getDeparturesForStation(bot, msg, station);
+  if(station.name.includes(' ZUG')) {
+    departureGtfsHelper.getDeparturesForStation(bot, msg, station);
+  } else {
+    departureLvbHelper.getDeparturesForStation(bot, msg, station);
+  }
 }
 exports.handleMatchingStation = handleMatchingStation;
