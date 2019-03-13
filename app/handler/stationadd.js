@@ -15,7 +15,7 @@ exports.handleCommandAdd = function (bot, msg, match, isInCurrentContext) {
   }
   currentContextFun = isInCurrentContext
   gtfsHelper.fetchAllStops().then(data => {
-    const matchingStations = stationsHelper.getMatchingStations(data, match[0], currentContextFun)
+    const matchingStations = stationsHelper.getMatchingStations(data, match[2], currentContextFun)
     const formattedStations = matchingStations.map(station => {
       station.name = commonStationsHelper.normalizeStationName(station)
       return station
