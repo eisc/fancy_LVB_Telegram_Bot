@@ -1,6 +1,6 @@
 const tableHelper = require('./departuretable')
 
-exports.handleDeparture = function (bot, msg, station, departureResults) {
+exports.handleDeparture = function (bot, msg, station, departureResults)
   if (departureResults.length) {
     const departures = tableHelper.createAnswerForDepartureResult(departureResults)
     if(departures.length === 0) {
