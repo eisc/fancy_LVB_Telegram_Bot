@@ -1,56 +1,58 @@
-const moment = require('moment')
-var table = require('text-table')
+const tableHelper = require('./departuretable')
 
-
-exports.handleDeparture = function (bot, msg, station, departureResults) {
-    if (departureResults.length) {
-            var answer = createAnswerForDepartureResult(station, departureResults).slice(0, 10)
-            bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer, { align: ['r', 'l', 'r'] })}${"`"}`,
-            { parse_mode: 'Markdown',
-              reply_markup: {
-                inline_keyboard: [[{ text: 'mehr anzeigen', callback_data: station.id }]]
-              } })
-              bot.on('callback_query', query => {
-                bot.answerCallbackQuery(query.id)
-                console.log(station.id);
-                if (query.data === station.id) {
-                  var answer = createAnswerForDepartureResult(station, departureResults).slice(0, 20)
-                  bot.sendMessage(msg.chat.id, `Abfahrten für *${station.name}*\n${"`"}${table(answer, { align: ['r', 'l', 'r'] })}${"`"}`, { parse_mode: 'Markdown' })
-                }
-              })
+exports.handleDeparture = function (bot, msg, station, departureResults)
+  if (departureResults.length) {
+    const departures = tableHelper.createAnswerForDepartureResult(departureResults)
+    if(departures.length === 0) {
+      bot.sendMessage(msg.chat.id, `Keine aktuellen Abfahrten für *${station.name}* gefunden.`,
+        { parse_mode: 'Markdown' })
     } else {
-      bot.sendMessage(msg.chat.id, `Keine aktuellen Abfahrten für *${station.name}* gefunden.`, { parse_mode: 'Markdown' })
+      var sliceStart = 0;
+      const sliceSize = 10;
+      sendDepartureMessage(bot, msg, station, departures, sliceStart, sliceSize)
     }
+  }
 }
 
-function createAnswerForDepartureResult(station, departureResults) {
-var departure = []
-departureResults.forEach(res => {
-  res.timetable.forEach(time => {
-    departure.push([res.line.id,
-    res.line.direction,
-    handleDepartureTime(time),
-    handleDelay(time)])
+function sendDepartureMessage(bot, msg, station, departures, sliceMin, sliceSize) {
+  const sliceMax = getSliceMax(departures, sliceMin, sliceSize)
+  const answer = departures.slice(sliceMin, sliceMax)
+  const departTableStr = tableHelper.departureTable(station, answer)
+  bot.sendMessage(msg.chat.id, departTableStr, moreQuery(departures, sliceMax));
+  addCallbackHandler(bot, sliceMax, sliceSize, departures, station, msg)
+}
+
+function addCallbackHandler(bot, sliceStart, sliceSize, departures, station, msg) {
+  if(departures.length <= sliceStart) {
+    return
+  }
+  bot.once('callback_query', query => {
+    bot.answerCallbackQuery(query.id)
+    if (query.data === `more_departures_${sliceStart}`) {
+      sendDepartureMessage(bot, msg, station, departures, sliceStart, sliceSize)
+    }
   })
-})
-departure.sort((entry1, entry2) => entry1[2] - entry2[2])
-return departure
 }
 
-function handleDepartureTime(time) {
-    const depTime = new Date(Date.parse(time.departure))
-    var departureInMinutes = Math.floor(moment.duration(moment(depTime).diff(moment())).as('minutes'))
-    if (departureInMinutes === 0) {
-      return ''
-    }
-    return departureInMinutes
+function getSliceMax(departures, sliceMin, sliceSize) {
+  const sliceMax = sliceMin + sliceSize
+  if(sliceMax > departures.length) {
+    return departures.length
+  }
+  return sliceMax;
 }
 
-function handleDelay(time) {
-    const delay = new Date(time.departureDelay)
-    const delayMinutes = delay.getMinutes()
-    if (delayMinutes > 0) {
-        return ` +${delayMinutes}`
+function moreQuery(departures, sliceMax) {
+  if(departures.length <= sliceMax) {
+    return { parse_mode: 'Markdown' }
+  }
+  return {
+    parse_mode: 'Markdown',
+    reply_markup: {
+      inline_keyboard: [[{
+        text: 'mehr anzeigen',
+        callback_data: `more_departures_${sliceMax}`
+      }]]
     }
-    return ''
+  }
 }

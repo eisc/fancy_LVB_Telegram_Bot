@@ -1,0 +1,17 @@
+@startuml use cases
+(*) --> "Stationsname \neingeben"
+--> "Stationsliste nach \nName filtern"
+If "Mehr als eine Station gefunden" then 
+--> ["ja"] "Zeige gefundene \nStationsnamen an"
+--> "Wähle Station aus"
+--> "Frage Abfahrten \nfür Station für aktuellen \nZeitpunkt ab"
+else 
+--> ["nein"] "Frage Abfahrten \nfür Station für aktuellen \nZeitpunkt ab"
+--> "Zeige maximal 10 \nAbfahrten an"
+If "Mehr als 10 Abfahrten gefunden" then
+--> ["ja"] "Zeige \n'More' Button"
+--> "Klick auf \n'More' Button"
+--> "Zeige maximal 10 \nAbfahrten an"
+else 
+--> ["nein"] (*)
+@enduml

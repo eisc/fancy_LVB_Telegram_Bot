@@ -1,0 +1,62 @@
+@startuml use cases
+actor User
+User -> bot: "<Station name>"
+bot -> "app.js": "<Station name>"
+"app.js" -> "handler/station.js": handlePotentialStation(requested)
+"handler/station.js" -> "helper/gtfs.js": fetchAllStops
+"helper/gtfs.js" -> "node-cache": look up stations
+alt cache is empty
+  "helper/gtfs.js" -> "node-fetch": "fetch https://gtfs.leipzig.codefor.de/\notp/routers/default/index/stops"
+  "helper/gtfs.js" <-- "node-fetch": all stops
+  "helper/gtfs.js" -> "node-cache": put stops into cache
+else serve from cache
+  "helper/gtfs.js" <-- "node-cache": all stops
+end
+"handler/station.js" <-- "helper/gtfs.js": all stops
+"handler/station.js" -> "helper/stations.js": getMatchingStations(all, requested)
+"helper/stations.js" -> "helper/commonstations.js": getMatchingStations(all, requested)
+loop for all stations
+  "helper/commonstations.js" -> "helper/commonstations.js": stationIncludesStringInName(station, requested)
+end
+"helper/stations.js" <-- "helper/commonstations.js": matching stations
+"handler/station.js" <-- "helper/stations.js": matching stations
+"handler/station.js" -> "helper/stations.js": handleMatchingStations
+alt more than 11 stations found
+  "helper/stations.js" -> bot: abort with message to user to request again with a more specific station
+else no station found
+  "helper/stations.js" -> bot: abort with message to user that no station name matches the input
+else exactly one station found
+  "helper/stations.js" -> "handler/station.js": handleMatchingStation
+else more than one station found
+  "helper/stations.js" -> "helper/stations.js": handleMultipleMatchingStations
+  activate "helper/stations.js"
+    "helper/stations.js" -> "helper/commonstations.js": transformToSelectableStationNames
+    "helper/stations.js" -> bot: Display selectable station names
+  deactivate "helper/stations.js"
+  User -> bot: Click on station name
+  bot -> "handler/station.js": handleMatchingStation
+  "handler/station.js" -> "helper/departure_lvb.js": getDeparturesForStation
+  "helper/departure_lvb.js" -> "helper/commonstations.js": normalizeStationId(stationId)
+  "helper/departure_lvb.js" <-- "helper/commonstations.js": station id without '1:00' prefix
+  "helper/departure_lvb.js" -> "lvb": departures(normalizeStationId, now)
+  "helper/departure_lvb.js" <-- "lvb": departures for station from now on
+  "helper/departure_lvb.js" -> "helper/departure.js": handleDeparture
+  "helper/departure.js" -> "helper/departuretable.js": createAnswerForDepartureResult
+  loop for each departure entry
+    "helper/departuretable.js" -> "helper/departurecalc.js": calcDepartureMinutesFromNow
+    "helper/departuretable.js" -> "helper/departurecalc.js": calcDelayInMinutes
+  end
+  "helper/departuretable.js" -> "helper/departuresort.js": compareDepartureEntries
+  "helper/departure.js" -> "helper/departure.js": sendDepartureMessage
+  activate "helper/departure.js"
+    "helper/departure.js" -> "helper/departure.js": getSliceMax
+    "helper/departure.js" -> "helper/departuretable.js": departureTable
+    "helper/departuretable.js" -> "text-table": table
+    "helper/departuretable.js" <-- "text-table": formatted table
+    "helper/departure.js" -> "helper/departuretable.js": formatted table
+    "helper/departure.js" -> bot: Display formatted table
+  deactivate "helper/departure.js"
+  User -> bot: Click on 'more' button
+  bot -> "helper/departure.js": sendDepartureMessage (the 10 departures)
+end
+@enduml
