@@ -2,6 +2,8 @@ const table = require('text-table')
 const sortHelper = require('./departuresort')
 const calcHelper = require('./departurecalc')
 
+const MAX_LETTER_COUNT = 17;
+
 exports.createAnswerForDepartureResult = function(departureResults) {
   var departure = []
   if(departureResults.length === 0) {
@@ -51,5 +53,16 @@ function answerToTable(answer) {
     'l',
     'r']
   };
-  return table(answer, style)
+  return table(shortenName(answer), style)
+}
+
+function shortenName(answer) {
+  for(i=0; i<answer.length; i++) {
+    const dataSet = answer[i]
+    const station = answer[i][1]
+    if (station.length > MAX_LETTER_COUNT) {
+      answer[i][1] = station.substring(0, MAX_LETTER_COUNT)  
+    }
+  }
+  return answer
 }
