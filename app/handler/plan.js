@@ -5,7 +5,7 @@ exports.handleCommandPlan = function (bot, msg) {
   bot.once('callback_query', query => handlePlanSelection(bot, msg, query))
 }
 
-function getPlanSelection() {
+function getPlanSelection () {
   return {
     reply_markup: {
       inline_keyboard: [
@@ -22,13 +22,13 @@ function getPlanSelection() {
   }
 }
 
-function handlePlanSelection(bot, msg, query) {
+function handlePlanSelection (bot, msg, query) {
   bot.answerCallbackQuery(query.id)
   bot.sendChatAction(msg.chat.id, 'upload_document')
   bot.sendDocument(msg.chat.id, jmap[query.data].path, getPlanAsDocument(query))
 }
 
-function getPlanAsDocument(query) {
+function getPlanAsDocument (query) {
   return {
     caption: `*${jmap[query.data].title}*\n${jmap[query.data].description}`,
     parse_mode: 'Markdown'

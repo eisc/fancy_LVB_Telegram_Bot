@@ -19,4 +19,4 @@ bot.onText(/\/reset(\s*)(.*)/, (msg, match) => handleCommandReset(bot, msg, matc
 bot.on('location', (msg) => handleCommandLocation(bot, msg))
 
 const noKeyword = /^((?!(\/start|\/help|\/plan|\/add|\/context|\/reset)).)*$/
-bot.onText(noKeyword, (msg, match) => handlePotentialStation(bot, msg, match, isInCurrentContext));
+bot.onText(noKeyword, (msg, match) => handlePotentialStation(bot, msg, match, isInCurrentContext))
