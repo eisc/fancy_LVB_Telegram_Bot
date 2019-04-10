@@ -13,25 +13,25 @@ exports.handleMatchingStations = function (bot, msg, stations, requestString,
   } else if (stations.length === 1) {
     handleMatchingStationFun(bot, msg, stations[0])
   } else {
-    handleMultipleMatchingStations(bot, msg, stations, handleMatchingStationFun);
+    handleMultipleMatchingStations(bot, msg, stations, handleMatchingStationFun)
   }
 }
 
-function handleMultipleMatchingStations(bot, msg, stations, handleMatchingStationFun) {
-  const selectableStationNames = commonStationHelper.transformToSelectableStationNames(stations);
+function handleMultipleMatchingStations (bot, msg, stations, handleMatchingStationFun) {
+  const selectableStationNames = commonStationHelper.transformToSelectableStationNames(stations)
   bot.sendMessage(msg.chat.id,
     `Meintest du eine dieser ${selectableStationNames.length} Haltestellen?`,
-    offerMatchingStationsForSelection(selectableStationNames));
+    offerMatchingStationsForSelection(selectableStationNames))
   bot.on('callback_query', query => {
-    const station = stations.find(station => station.id === query.data);
-    bot.answerCallbackQuery(query.id);
+    const station = stations.find(station => station.id === query.data)
+    bot.answerCallbackQuery(query.id)
     if (station) {
       handleMatchingStationFun(bot, msg, station)
     }
-  });
+  })
 }
 
-function offerMatchingStationsForSelection(stationNames) {
+function offerMatchingStationsForSelection (stationNames) {
   return {
     reply_markup: {
       inline_keyboard: stationNames
@@ -39,10 +39,10 @@ function offerMatchingStationsForSelection(stationNames) {
   }
 }
 
-function noStationsFound(stations) {
-  return stations.length === 0;
+function noStationsFound (stations) {
+  return stations.length === 0
 }
 
-function tooManyStationsFound(stations) {
-  return stations.length >= 11;
+function tooManyStationsFound (stations) {
+  return stations.length >= 11
 }
