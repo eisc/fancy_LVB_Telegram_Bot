@@ -10,30 +10,30 @@ exports.getMatchingGlobalStations = function (stationName) {
 }
 
 exports.addGlobalStation = function (station) {
-  if(!containedInGlobalStations(station)) {
+  if (!containedInGlobalStations(station)) {
     globalStations.push(station)
   }
 }
 
-function getGlobalStationIds() {
+function getGlobalStationIds () {
   return globalStations.map(globalStation => globalStation.id)
 }
 
-function containedInGlobalStations(station) {
+function containedInGlobalStations (station) {
   return getGlobalStationIds().indexOf(station.id) !== -1
 }
-exports.containedInGlobalStations = containedInGlobalStations;
+exports.containedInGlobalStations = containedInGlobalStations
 
 exports.removeFromGlobalStations = function (station) {
   globalStations.splice(globalStations.indexOf(station), 1)
 }
 
-function deleteGlobalStations() {
+function deleteGlobalStations () {
   globalStations.length = 0
 }
 exports.deleteGlobalStations = deleteGlobalStations
 
-function removeKeyboard() {
+function removeKeyboard () {
   return {
     reply_markup: {
       remove_keyboard: true

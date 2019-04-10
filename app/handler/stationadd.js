@@ -3,8 +3,8 @@ const stationsHelper = require('../helper/stations')
 const globalStationsHelper = require('../helper/globalstations')
 const commonStationsHelper = require('../helper/commonstations')
 
-function defaultContextFun() { 
-  return true 
+function defaultContextFun () {
+  return true
 }
 var currentContextFun = defaultContextFun
 
@@ -24,14 +24,14 @@ exports.handleCommandAdd = function (bot, msg, match, isInCurrentContext) {
   }).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))
 }
 
-function handleMatchingStation(bot, msg, station) {
+function handleMatchingStation (bot, msg, station) {
   if (globalStationsHelper.containedInGlobalStations(station)) {
-    bot.sendMessage(msg.chat.id, `${station.name} steht bereits auf der Liste.`);
+    bot.sendMessage(msg.chat.id, `${station.name} steht bereits auf der Liste.`)
   } else if (currentContextFun(station)) {
-    globalStationsHelper.addGlobalStation(station);
+    globalStationsHelper.addGlobalStation(station)
     bot.sendMessage(msg.chat.id, `${station.name} wurde hinzugefügt.`,
-    globalStationsHelper.globalStationsAsKeyboard())
+      globalStationsHelper.globalStationsAsKeyboard())
   } else {
-    bot.sendMessage(msg.chat.id, `${station.name} passt nicht zum aktuell gesetzten Context.`);
+    bot.sendMessage(msg.chat.id, `${station.name} passt nicht zum aktuell gesetzten Context.`)
   }
 }

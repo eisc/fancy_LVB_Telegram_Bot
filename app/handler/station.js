@@ -16,10 +16,10 @@ exports.handlePotentialStation = function (bot, msg, match, contextResolver) {
 }
 
 function handleMatchingStation (bot, msg, station) {
-  if(station.name.includes(' ZUG')) {
-    departureGtfsHelper.getDeparturesForStation(bot, msg, station);
+  if (station.name.includes(' ZUG')) {
+    departureGtfsHelper.getDeparturesForStation(bot, msg, station)
   } else {
-    departureLvbHelper.getDeparturesForStation(bot, msg, station);
+    departureLvbHelper.getDeparturesForStation(bot, msg, station)
   }
 }
-exports.handleMatchingStation = handleMatchingStation;
+exports.handleMatchingStation = handleMatchingStation

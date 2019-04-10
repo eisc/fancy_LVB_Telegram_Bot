@@ -7,7 +7,7 @@ exports.getDeparturesForStation = function (bot, msg, station) {
     lvb.departures(commonStationHelper.normalizeStationId(station.id), new Date()).then(
       departures => departureHelper.handleDeparture(bot, msg, station, departures)
     )
-  } catch(error) {
+  } catch (error) {
     bot.sendMessage(msg.chat.id, 'Fehler ' + error.message)
   }
 }
