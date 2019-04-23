@@ -1,3 +1,5 @@
+const stationMerger = require('./station_merger')
+
 exports.normalizeStationId = function (stationId) {
   if (stationId.startsWith('1:')) {
     return stationId.substring(4)
@@ -16,8 +18,16 @@ exports.normalizeStationName = function (station) {
 }
 
 exports.getMatchingStations = function (stations, charSequence, contextResolver) {
-  return stations.filter(stop => stationIncludesStringInName(stop, charSequence))
+  return withCompositeStations(stations)
+    .filter(stop => stationIncludesStringInName(stop, charSequence))
     .filter(stop => contextResolver(stop))
+}
+
+function withCompositeStations(stations) {
+  const allStations = []
+  stations.forEach(st => allStations.push(st))
+  stationMerger.getCompositeStations().forEach(st => allStations.push(st))
+  return allStations
 }
 
 function stationIncludesStringInName (station, charSequence) {

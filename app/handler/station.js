@@ -16,10 +16,20 @@ exports.handlePotentialStation = function (bot, msg, match, contextResolver) {
 }
 
 function handleMatchingStation (bot, msg, station) {
-  if(station.name.includes(' ZUG')) {
-    departureGtfsHelper.getDeparturesForStation(bot, msg, station);
+  if(station.mappedStations.length > 0) {
+    station.mappedStations.forEach(
+      mapped => handleSingleMatchingStation(bot, msg, mapped)
+    )
+  } else {
+    handleSingleMatchingStation(bot, msg, station)
+  }
+}
+exports.handleMatchingStation = handleMatchingStation
+
+function handleSingleMatchingStation (bot, msg, station) {
+  if (station.name.includes(' ZUG')) {
+    departureGtfsHelper.getDeparturesForStation(bot, msg, station)
   } else {
     departureLvbHelper.getDeparturesForStation(bot, msg, station);
   }
 }
-exports.handleMatchingStation = handleMatchingStation;
