@@ -16,7 +16,7 @@ exports.handlePotentialStation = function (bot, msg, match, contextResolver) {
 }
 
 function handleMatchingStation (bot, msg, station) {
-  if(station.mappedStations.length > 0) {
+  if(station.mappedStations && station.mappedStations.length > 0) {
     station.mappedStations.forEach(
       mapped => handleSingleMatchingStation(bot, msg, mapped)
     )

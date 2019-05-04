@@ -27,6 +27,27 @@ function withCompositeStations(stations) {
   const allStations = []
   stations.forEach(st => allStations.push(st))
   stationMerger.getCompositeStations().forEach(st => allStations.push(st))
+  return removeDuplicateStations(allStations)
+}
+
+function removeDuplicateStations(stations) {
+  const allStations = []
+  const allMappedStations = []
+  stations.forEach(station => {
+    if(station.mappedStations && station.mappedStations.length > 0) {
+      station.mappedStations.forEach(ms => {
+        if (!allMappedStations.includes(ms.id)) {
+          allMappedStations.push(ms.id)
+        }        
+      })
+    }
+  })
+  stations.forEach(station => {
+    if ((station.mappedStations && station.mappedStations.length > 0) 
+        || !allMappedStations.includes(station.id)) {
+      allStations.push(station)
+    }
+  })
   return allStations
 }
 
