@@ -1,6 +1,6 @@
 exports.compareDepartureEntries = function (entry1, entry2) {
   function compareDirection() {
-    return compareStrings(entry1[1], entry2[1], () => -1)
+    return compareStrings(entry1[1], entry2[1], () => 0)
   }
   function compareLineIds() {
     return compareStrings(entry1[0], entry2[0], compareDirection)

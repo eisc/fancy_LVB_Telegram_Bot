@@ -22,7 +22,8 @@ exports.createAnswerForDepartureResult = function(departureResults) {
     }
   })
   departure.sort((entry1, entry2) => sortHelper.compareDepartureEntries(entry1, entry2))
-  return departure
+  return departure.filter((elem, index, array) => (index == array.length - 1)
+        || sortHelper.compareDepartureEntries(elem, array[index + 1]) < 0)
 }
 
 function formattedDepartureMinutesFromNow(time) {

@@ -103,19 +103,6 @@ exports.getCompositeStations = function () {
             ],
         },
         {
-            name: 'Leipzig, S-Bahnhof Stötteritz',
-            mappedStations: [
-                {
-                    id: '1:0011336',
-                    name: 'Leipzig, S-Bahnhof Stötteritz',
-                },
-                {
-                    id: '1:8012194',
-                    name: 'Leipzig-Stötteritz ZUG'
-                }
-            ],
-        },
-        {
             name: 'Leipzig, S-Bahnhof Messe',
             mappedStations: [
                 {
@@ -258,7 +245,7 @@ exports.getCompositeStations = function () {
             ],
         },
         {
-            name: 'Leipzig, S-Bahnhof Slevogtstr.',
+            name: 'Leipzig, Wilhelm-Leuschner-Platz',
             mappedStations: [
                 {
                     id: '1:8012202',
