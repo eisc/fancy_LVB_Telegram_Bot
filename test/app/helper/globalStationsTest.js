@@ -1,6 +1,6 @@
 const expect = require('chai').expect;
 const {
-  isEmpty,
+  globalStationsLength,
   containedInGlobalStations,
   getMatchingGlobalStations,
   addGlobalStation,
@@ -19,10 +19,10 @@ describe('test globalStations', () => {
     deleteGlobalStations()
   })
 
-  describe('test isEmpty', () => {
+  describe('test globalStationsLength', () => {
 
     it('true when never added a station', () => {
-      expect(isEmpty()).to.be.true
+      expect(globalStationsLength()).to.be.equal(0)
     });
 
     it('true, when just added station', () => {
@@ -32,7 +32,7 @@ describe('test globalStations', () => {
       };
       addGlobalStation(myStation)
 
-      expect(isEmpty()).to.be.false
+      expect(globalStationsLength()).to.be.equal(1)
     });
 
     it('false, when removed just added station', () => {
@@ -43,7 +43,7 @@ describe('test globalStations', () => {
       addGlobalStation(myStation1)
       removeFromGlobalStations(myStation1)
 
-      expect(isEmpty()).to.be.true
+      expect(globalStationsLength()).to.be.equal(0)
     });
   });
 
