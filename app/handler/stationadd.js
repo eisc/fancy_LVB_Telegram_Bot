@@ -24,6 +24,11 @@ exports.handleCommandAdd = function (bot, msg, match, isInCurrentContext) {
   }).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))
 }
 
+
+
+//Todo: return strings and move bot.sendMessage to handleCommandAdd, if possible
+//if not possible, separate bot-concerns from general concerns
+//no handler-function, rename,
 function handleMatchingStation(bot, msg, station) {
   if (globalStationsHelper.containedInGlobalStations(station)) {
     bot.sendMessage(msg.chat.id, `${station.name} steht bereits auf der Liste.`);

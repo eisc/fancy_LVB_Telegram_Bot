@@ -8,9 +8,9 @@ exports.handleCommandReset = function (bot, msg, match) {
   }
   if (match[2]) {
     const matchingStations = globalStationsHelper.getMatchingGlobalStations(match[2])
-    stationsHelper.handleMatchingStations(bot, msg, matchingStations, match[2], handleMatchingStation)
+    stationsHelper.handleMatchingStations(bot, msg, matchingStations, match[2], handleMatchingStation) //extract
   } else {
-    handleDeleteCompleteListRequest(bot, msg);
+    handleDeleteCompleteListRequest(bot, msg); //extract
   }
 }
 

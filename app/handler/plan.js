@@ -1,3 +1,4 @@
+//name the import-constants like the modules, then it becomes more readable
 const jmap = require('../../config/maps.json')
 
 exports.handleCommandPlan = function (bot, msg) {
@@ -22,6 +23,9 @@ function getPlanSelection () {
   }
 }
 
+
+//bot-object included, seems to make Sense in this case, ev. move all instructions of this function to handleCommandPlan function
+//if desired
 function handlePlanSelection (bot, msg, query) {
   bot.answerCallbackQuery(query.id)
   bot.sendChatAction(msg.chat.id, 'upload_document')

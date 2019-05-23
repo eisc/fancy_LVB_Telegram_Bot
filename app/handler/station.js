@@ -1,3 +1,5 @@
+
+//import names should be the module-names, now it is very difficult to follow
 const gtfsHelper = require('../helper/gtfs')
 const stationsHelper = require('../helper/stations')
 const departureLvbHelper = require('../helper/departure_lvb')
@@ -13,7 +15,7 @@ exports.handlePotentialStation = function (bot, msg, match, contextResolver) {
       return station
     })
     return Promise.resolve(formattedStations)
-  }).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))
+  }).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))  //ToDo: bot-argument should not be given to next functions
 }
 
 function handleMatchingStation (bot, msg, station) {
