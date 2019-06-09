@@ -40,6 +40,11 @@ process.env['NTBA_FIX_319'] = 1
 //maybe better import modules only, name the imports like the module and use as
 //[module_name].exportedFunction
 //like this it's difficult to follow the code
+
+//examples for inconsequent import-naming:
+//const { handleCommandStart, handleCommandHelp } = require('./handler/general')
+//const { handleCommandAdd } = require('./handler/stationadd')
+
 const { handleCommandStart, handleCommandHelp } = require('./handler/general')
 const { handleContext, isInCurrentContext } = require('./handler/context')
 const { handleCommandPlan } = require('./handler/plan')
@@ -57,11 +62,15 @@ bot.onText(/\/plan/, (msg, match) => handleCommandPlan(bot, msg, match)) //bot-o
                                                                         //'handlePlanSelection' is no handler-function -> rename it
 bot.onText(/\/add(\s*)(.*)/, (msg, match) => handleCommandAdd(bot, msg, match, isInCurrentContext)) //bot-object still in other function handleMatchingStation
                     //1) rename handleMatchingStation, because it is no handler-function
-                    //2) try to remove bot-object from this funktion, if possible
-                    //bot-obj is not given further as argument
-bot.onText(/\/reset(\s*)(.*)/, (msg, match) => handleCommandReset(bot, msg, match))  //ToDo: bot-object-argument still in multiple functions
+                    //2) try to remove bot-object from this function, if possible
+                    //bot-obj is not given further as argument - therefore handleMatchingStation can stay part of the Interface (respectively the Controller)
+bot.onText(/\/reset(\s*)(.*)/, (msg, match) => handleCommandReset(bot, msg, match)) 
+                    //ToDo: bot-object-argument still in multiple functions
+                    //but all theses Function can be declared as controller-Functions
+                    //controller (interface) is therefore clean
 bot.on('location', (msg) => handleCommandLocation(bot, msg))  //ToDo: bot-object still in multiple functions, seems difficult to separate
                                                             //more Domain-Knowledge needed to decide how to separate
+                                                            //in location.ja, line 26, import not found
 
 const noKeyword = /^((?!(\/start|\/help|\/plan|\/add|\/context|\/reset)).)*$/
 bot.onText(noKeyword, (msg, match) => handlePotentialStation(bot, msg, match, isInCurrentContext))  //ToDo: bot-object still in multiple functions, seems difficult to separate

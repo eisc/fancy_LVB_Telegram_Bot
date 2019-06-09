@@ -13,13 +13,13 @@ exports.handleContext = function (bot, msg, match) {
     bot.sendMessage(msg.chat.id, 'Bitte gib einen Stadtnamen (oder "MDV" für alle) ein.')
     return
   }
-  var message=getMessageAndSetContext(msg, match[2])
+  var message=getMessageAndSetContext(match[2])
   bot.sendMessage(msg.chat.id, message);
 }
 
 //separate in two functions
 //bot-object extracted
-function getMessageAndSetContext (msg, context) {
+function getMessageAndSetContext (context) {
   if (context === 'MDV') {
     currentContext = null   //why set to null, when 'MDV' wanted?
     return '"MDV" erfolgreich als context gesetzt'

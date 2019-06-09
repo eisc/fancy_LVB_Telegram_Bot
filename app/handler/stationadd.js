@@ -27,6 +27,9 @@ exports.handleCommandAdd = function (bot, msg, match, isInCurrentContext) {
 
 
 //Todo: return strings and move bot.sendMessage to handleCommandAdd, if possible
+//but: this can be sub-function of handleCommandAdd
+//that means, that this little Function can be Part of the "Interface" respectively the controller
+//so actually, depending on the philosophy, nothing has to be changed here
 //if not possible, separate bot-concerns from general concerns
 //no handler-function, rename,
 function handleMatchingStation(bot, msg, station) {
