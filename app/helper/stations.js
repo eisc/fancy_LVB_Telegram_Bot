@@ -4,8 +4,11 @@ exports.getMatchingStations = function (stations, charSequence, contextResolver)
   return commonStationHelper.getMatchingStations(stations, charSequence, contextResolver)
 }
 
+
+//why is handler-function in helper-module?
+//Actually it is no handler-function, rename!
 exports.handleMatchingStations = function (bot, msg, stations, requestString,
-  handleMatchingStationFun) {
+  handleMatchingStationFun) {   //why renaming the handleMatchingStation-function to handleMatchingStationFun??
   if (tooManyStationsFound(stations)) {
     bot.sendMessage(msg.chat.id, 'Es gibt zu viele Treffer, bitte gib was genaueres ein.')
   } else if (noStationsFound(stations)) {
@@ -17,6 +20,7 @@ exports.handleMatchingStations = function (bot, msg, stations, requestString,
   }
 }
 
+//why is handler-function in helper-module?
 function handleMultipleMatchingStations(bot, msg, stations, handleMatchingStationFun) {
   const selectableStationNames = commonStationHelper.transformToSelectableStationNames(stations);
   bot.sendMessage(msg.chat.id,

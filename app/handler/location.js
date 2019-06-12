@@ -1,3 +1,5 @@
+
+//name the import-constants like the modules, then it becomes more readable
 const gtfsHelper = require('../helper/gtfs')
 const stationHelper = require('./station')
 const commonStationsHelper = require('../helper/commonstations')

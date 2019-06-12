@@ -24,6 +24,14 @@ exports.handleCommandAdd = function (bot, msg, match, isInCurrentContext) {
   }).then(stations => stationsHelper.handleMatchingStations(bot, msg, stations, match[0], handleMatchingStation))
 }
 
+
+
+//Todo: return strings and move bot.sendMessage to handleCommandAdd, if possible
+//but: this can be sub-function of handleCommandAdd
+//that means, that this little Function can be Part of the "Interface" respectively the controller
+//so actually, depending on the philosophy, nothing has to be changed here
+//if not possible, separate bot-concerns from general concerns
+//no handler-function, rename,
 function handleMatchingStation(bot, msg, station) {
   if (globalStationsHelper.containedInGlobalStations(station)) {
     bot.sendMessage(msg.chat.id, `${station.name} steht bereits auf der Liste.`);

@@ -1,6 +1,7 @@
 const globalStationsHelper = require('../helper/globalstations')
 const stationsHelper = require('../helper/stations')
 
+//Controller-Function
 exports.handleCommandReset = function (bot, msg, match) {
   if (globalStationsHelper.globalStationsLength() === 0) {
     bot.sendMessage(msg.chat.id, 'Liste ist bereits leer.')
@@ -8,17 +9,19 @@ exports.handleCommandReset = function (bot, msg, match) {
   }
   if (match[2]) {
     const matchingStations = globalStationsHelper.getMatchingGlobalStations(match[2])
-    stationsHelper.handleMatchingStations(bot, msg, matchingStations, match[2], handleMatchingStation)
+    stationsHelper.handleMatchingStations(bot, msg, matchingStations, match[2], handleMatchingStation) //can stay part of interface (controller), no extraction required
   } else {
-    handleDeleteCompleteListRequest(bot, msg);
+    handleDeleteCompleteListRequest(bot, msg); //can stay part of Interface (Controller, no extraction required)
   }
 }
 
+//Controller-Function
 function handleDeleteCompleteListRequest(bot, msg) {
   bot.sendMessage(msg.chat.id, 'gesamte Liste löschen?', secondDeleteCompleteListRequest());
   bot.once('callback_query', query => handleSecondDeleteCompleteListRequest(bot, msg, query));
 }
 
+//Controller-Function
 function secondDeleteCompleteListRequest() {
   return {
     reply_markup: {
@@ -32,6 +35,7 @@ function secondDeleteCompleteListRequest() {
   }
 }
 
+//Controller-Function
 function handleSecondDeleteCompleteListRequest(bot, msg, query) {
   bot.answerCallbackQuery(query.id);
   if (query.data === 'reset') {
@@ -42,6 +46,7 @@ function handleSecondDeleteCompleteListRequest(bot, msg, query) {
   }
 }
 
+//Controller-Function
 function handleMatchingStation(bot, msg, station) {
   if (globalStationsHelper.globalStationsLength() === 1) {
     globalStationsHelper.deleteGlobalStations()
