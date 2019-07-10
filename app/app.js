@@ -72,6 +72,58 @@ bot.on('location', (msg) => handleCommandLocation(bot, msg))  //ToDo: bot-object
                                                             //more Domain-Knowledge needed to decide how to separate
                                                             //in location.ja, line 26, import not found
 
+bot.on("inline_query", function (data) {
+    var content = data.query;
+    console.log(content);
+    const list = [
+        {
+            id: '0',
+            type: 'article',
+            title: 'Gerichtsweg',
+            message_text: 'Abfahrt Gerichtsweg'
+        },
+        {
+            id: '1',
+            type: 'article',
+            title: 'Münzgasse',
+            message_text: 'Abfahrt Münzgasse'
+        },
+        {
+            id: '2',
+            type: 'article',
+            title: 'Steinweg',
+            message_text: 'Abfahrt Steinweg'
+        }
+    ]
+    // examples:
+    // * https://github.com/yagop/node-telegram-bot-api/issues/557
+    // * https://github.com/yagop/node-telegram-bot-api/issues/729
+    // * 
+
+/*     interface InlineQueryResultBase {
+        id: string;
+        reply_markup?: InlineKeyboardMarkup;
+    }
+
+    interface InlineQueryResultArticle extends InlineQueryResultBase {
+        type: 'article';
+        title: string;
+        input_message_content: InputMessageContent;
+        url?: string;
+        hide_url?: boolean;
+        description?: string;
+        thumb_url?: string;
+        thumb_width?: number;
+        thumb_height?: number;
+    } */
+
+    // todos
+    // * take data.query string, fetch stations, display
+    bot.answerInlineQuery(data.id, list);
+    // to send message to bot directly
+    //bot.sendMessage(data.from.id, "hello world");
+});
+
 const noKeyword = /^((?!(\/start|\/help|\/plan|\/add|\/context|\/reset)).)*$/
 bot.onText(noKeyword, (msg, match) => handlePotentialStation(bot, msg, match, isInCurrentContext))  //ToDo: bot-object still in multiple functions, seems difficult to separate
                                                                                                     //more Domain-Knowledge needed to decide how to separate
