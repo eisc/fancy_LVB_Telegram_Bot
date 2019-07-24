@@ -4,7 +4,7 @@ const gtfsCache = new NodeCache();
 const stopKey = "stops"
 const moment = require('moment')
 
-exports.fetchAllStops = function(bot, msg) {
+exports.fetchAllStops_old = function(bot, msg) {
   const stops = gtfsCache.get(stopKey)
   if(stops) {
     return Promise.resolve(stops);
@@ -23,7 +23,23 @@ exports.fetchAllStops = function(bot, msg) {
   }
 }
 
-exports.fetchDeparture = function(bot, msg, stopId) {
+exports.fetchAllStops = async function(bot, msg) {
+  const stops = gtfsCache.get(stopKey)
+  if(stops) {
+    return stops;
+  }
+  try {
+    const result = await fetch('https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops')
+    const retrievedStops = result.json()
+    gtfsCache.set(stopKey, retrievedStops)
+    return retrievedStops
+  } catch (error) {
+    bot.sendMessage(msg, 'Fehler beim Abrufen der Haltestellen')
+    return []
+  }
+}
+
+exports.fetchDeparture_old = function(bot, msg, stopId) {
   try {
     const now = moment().format('YYYYMMDD')
     return fetch(`https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops/${stopId}/stoptimes/${now}`).then(response => {
@@ -34,6 +50,19 @@ exports.fetchDeparture = function(bot, msg, stopId) {
         return transformed
       }
     )
+  } catch (error) {
+    bot.sendMessage(msg, 'Fehler beim Abrufen der Abfahrten')
+    return Promise.resolve([])
+  }
+}
+
+exports.fetchDeparture = async function(bot, msg, stopId) {
+  try {
+    const now = moment().format('YYYYMMDD')
+    const response = await fetch(`https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops/${stopId}/stoptimes/${now}`)
+    const retrievedDepartures = JSON.parse(response.text())
+    const transformed = transformToLvbLayout(retrievedDepartures)
+    return transformed
   } catch (error) {
     bot.sendMessage(msg, 'Fehler beim Abrufen der Abfahrten')
     return Promise.resolve([])
