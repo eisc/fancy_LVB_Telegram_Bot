@@ -1,18 +1,11 @@
 const commonStationHelper = require('./commonstations')
+const selectionHelper = require('../../helper/stations/selection')
 
-exports.getMatchingStations = function (stations, charSequence, contextResolver) {
-  return commonStationHelper.getMatchingStations(stations, charSequence, contextResolver)
-}
-
-
-//why is handler-function in helper-module?
-//Actually it is no handler-function, rename!
 exports.handleMatchingStations = function (bot, msg, stations, requestString,
-  handleMatchingStationFun) {   //why renaming the handleMatchingStation-function to handleMatchingStationFun??
-  if (tooManyStationsFound(stations)) {
-    bot.sendMessage(msg.chat.id, 'Es gibt zu viele Treffer, bitte gib was genaueres ein.')
-  } else if (noStationsFound(stations)) {
-    bot.sendMessage(msg.chat.id, `${requestString} ist keine Haltestelle, versuch es nochmal. \u{1F643}`)
+  handleMatchingStationFun) {
+  const message = selectionHelper.getMessageForMatchingStations(station, requestString)
+  if (message) {
+    bot.sendMessage(msg.chat.id, message)
   } else if (stations.length === 1) {
     handleMatchingStationFun(bot, msg, stations[0])
   } else {
@@ -43,10 +36,4 @@ function offerMatchingStationsForSelection(stationNames) {
   }
 }
 
-function noStationsFound(stations) {
-  return stations.length === 0;
-}
 
-function tooManyStationsFound(stations) {
-  return stations.length >= 11;
-}

@@ -1,12 +1,9 @@
-
-//name the import-constants like the modules, then it becomes more readable
-const gtfsHelper = require('../helper/gtfs')
-const stationHelper = require('./station')
-const commonStationsHelper = require('../helper/commonstations')
+const gtfs = require('../helper/gtfs')
+const stationMatcher = require('./station')
 
 exports.handleCommandLocation = function (bot, msg) {
-  gtfsHelper.fetchAllStops().then(data => {
-  let dataWithDistance = data.map(stop => {
+  const stops = gtfs.fetchAllStops();
+  let dataWithDistance = stops.map(stop => {
     stop.distance = Math.sqrt(Math.pow((msg.location.longitude - stop.lon) * Math.cos((msg.location.latitude + stop.lat) / 2), 2) + Math.pow(msg.location.latitude - stop.lat, 2)) * 63710
     return stop
   })
@@ -23,7 +20,6 @@ exports.handleCommandLocation = function (bot, msg) {
   bot.once('callback_query', query => {
     const station = selection.find(station => station.id === query.data)
     bot.answerCallbackQuery(query.id)
-    stationHelper.handleMatchingStation(bot, msg, station)
-  })
+    stationMatcher.handleMatchingStation(bot, msg, station)
   })
 }

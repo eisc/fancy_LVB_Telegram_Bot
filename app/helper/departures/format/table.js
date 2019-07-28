@@ -1,6 +1,6 @@
 const table = require('text-table')
-const sortHelper = require('./departuresort')
-const calcHelper = require('./departurecalc')
+const sortHelper = require('./sort')
+const calcHelper = require('./calc')
 
 const MAX_LETTER_COUNT = 17;
 
@@ -59,10 +59,9 @@ function answerToTable(answer) {
 
 function shortenName(answer) {
   for(i=0; i<answer.length; i++) {
-    const dataSet = answer[i]
     const station = answer[i][1]
     if (station.length > MAX_LETTER_COUNT) {
-      answer[i][1] = station.substring(0, MAX_LETTER_COUNT)  
+      answer[i][1] = station.substring(0, MAX_LETTER_COUNT)
     }
   }
   return answer

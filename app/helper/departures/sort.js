@@ -34,7 +34,7 @@ function convertNumberStr(delayStr) {
   if(!Number.isFinite(delayStr)) {
     return delayStr.length === 0
       ? 0
-      : Number(delayStr)  
+      : Number(delayStr)
   }
   return delayStr
 }
