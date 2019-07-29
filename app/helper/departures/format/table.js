@@ -1,6 +1,6 @@
 const table = require('text-table')
-const sortHelper = require('./sort')
-const calcHelper = require('./calc')
+const sortHelper = require('../sort')
+const calcHelper = require('../calc')
 
 const MAX_LETTER_COUNT = 17;
 

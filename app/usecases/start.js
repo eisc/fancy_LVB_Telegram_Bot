@@ -1,6 +1,6 @@
-exports.commandRegex = /\/start/
+const commandRegex = /\/start/
 
-exports.registerListener = function (bot) {
+function registerListener (bot) {
     bot.onText(commandRegex, msg => handleCommandStart (bot, msg))
 }
 
@@ -14,7 +14,7 @@ function getStartMessage(firstName) {
         + '\nBei /help werden dir alle Funktionen dieses Bots aufgelistet.'
 }
 
-exports.handleInline = function (bot, chatId) {
+function handleInline (bot, chatId) {
     const list = [
         {
             id: '0',
@@ -25,3 +25,9 @@ exports.handleInline = function (bot, chatId) {
     ]
     bot.answerInlineQuery(chatId, list);
 }
+
+module.exports = Object.freeze({
+    commandRegex,
+    registerListener,
+    handleInline
+});

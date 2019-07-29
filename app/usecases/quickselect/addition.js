@@ -2,17 +2,18 @@ const gtfsStations = require('../../helper/stations/gtfs')
 const stationsMatcher = require('../../helper/stations/matcher')
 const globalStations = require('../../helper/stations/global')
 const stationsNormalizer = require('../../helper/stations/normalizer')
-const selectionHelper = require('../../helper/stations/selection')
+const selection = require('../../helper/stations/selection/selection')
+const selectable = require('../../helper/stations/selection/selectable')
 
-exports.commandRegex = /\/add(\s*)(.*)/
+const commandRegex = /\/add(\s*)(.*)/
 
-exports.registerListener = function (bot, isInCurrentContextFun) {
-    bot.onText(commandRegex, (msg, match) => handleCommandAdd (bot, msg, match[2], isInCurrentContextFun))
+function registerListener (bot, isInCurrentContextFun) {
+    bot.onText(commandRegex, (msg, match) => handleCommandAdd (bot, msg.chat.id, match[2], isInCurrentContextFun))
 }
 
-exports.handleCommandAdd = function (bot, msg, station, isInCurrentContext) {
+function handleCommandAdd (bot, chatId, station, isInCurrentContext) {
   if (station === '') {
-    bot.sendMessage(msg.chat.id, 'Bitte gib eine Haltestelle ein.')
+    bot.sendMessage(chatId, 'Bitte gib eine Haltestelle ein.')
     return
   }
   const allStops = gtfsStations.fetchAllStops()
@@ -21,30 +22,30 @@ exports.handleCommandAdd = function (bot, msg, station, isInCurrentContext) {
     station.name = stationsNormalizer.normalizeStationName(station)
     return station
   })
-  handleMatchingStations(bot, msg, formattedStations, station, isInCurrentContext)
+  handleMatchingStations(bot, chatId, formattedStations, station)
 }
 
-function handleMatchingStations (bot, msg, stations, requestString) {
-  const message = selectionHelper.getMessageForMatchingStations(station, requestString)
+function handleMatchingStations (bot, chatId, stations, station) {
+  const message = selection.getMessageForMatchingStations(stations, station)
   if (message) {
-    bot.sendMessage(msg.chat.id, message)
+    bot.sendMessage(chatId, message)
   } else if (stations.length === 1) {
-    handleMatchingStation(bot, msg, stations[0])
+    handleMatchingStation(bot, chatId, stations[0])
   } else {
-    handleMultipleMatchingStations(bot, msg, stations);
+    handleMultipleMatchingStations(bot, chatId, stations);
   }
 }
 
-function handleMultipleMatchingStations(bot, msg, stations) {
-  const selectableStationNames = commonStationHelper.transformToSelectableStationNames(stations);
-  bot.sendMessage(msg.chat.id,
+function handleMultipleMatchingStations(bot, chatId, stations) {
+  const selectableStationNames = selectable.transformToSelectableStationNames(stations);
+  bot.sendMessage(chatId,
     `Meintest du eine dieser ${selectableStationNames.length} Haltestellen?`,
     offerMatchingStationsForSelection(selectableStationNames));
   bot.on('callback_query', query => {
     const station = stations.find(station => station.id === query.data);
     bot.answerCallbackQuery(query.id);
     if (station) {
-      handleMatchingStation(bot, msg, station)
+      handleMatchingStation(bot, chatId, station)
     }
   });
 }
@@ -57,14 +58,19 @@ function offerMatchingStationsForSelection(stationNames) {
   }
 }
 
-function handleMatchingStation(bot, msg, station) {
+function handleMatchingStation(bot, chatId, station) {
   if (globalStations.containedInGlobalStations(station)) {
-    bot.sendMessage(msg.chat.id, `${station.name} steht bereits auf der Liste.`);
+    bot.sendMessage(chatId, `${station.name} steht bereits auf der Liste.`);
   } else if (currentContextFun(station)) {
     globalStations.addGlobalStation(station);
-    bot.sendMessage(msg.chat.id, `${station.name} wurde hinzugefügt.`,
+    bot.sendMessage(chatId, `${station.name} wurde hinzugefügt.`,
     globalStations.globalStationsAsKeyboard())
   } else {
-    bot.sendMessage(msg.chat.id, `${station.name} passt nicht zum aktuell gesetzten Context.`);
+    bot.sendMessage(chatId, `${station.name} passt nicht zum aktuell gesetzten Context.`);
   }
 }
+
+module.exports = Object.freeze({
+  commandRegex,
+  registerListener
+});

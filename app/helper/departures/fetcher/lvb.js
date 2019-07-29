@@ -1,17 +1,13 @@
 const lvb = require('lvb')
-const commonStationHelper = require('./commonstations')
-const departureHelper = require('./departure')
+const normalizer = require('../../stations/normalizer')
+const query = require('../query')
 
 exports.getDeparturesForStation = function (bot, msg, station) {
-  try {
-    const departures = getLvbDeparturesForStation (station)
-    departureHelper.handleDeparture(bot, msg, station, departures)
-  } catch(error) {
-    bot.sendMessage(msg.chat.id, 'Fehler ' + error.message)
-  }
+  const departures = getLvbDeparturesForStation (station)
+  query.handleDeparture(bot, msg, station, departures)
 }
 
 async function getLvbDeparturesForStation (station) {
-    return await lvb.departures(commonStationHelper.normalizeStationId(station.id), new Date())
+    return await lvb.departures(normalizer.normalizeStationId(station.id), new Date())
 }
 exports.getLvbDeparturesForStation = getLvbDeparturesForStation

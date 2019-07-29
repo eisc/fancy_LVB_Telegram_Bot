@@ -1,12 +1,12 @@
 const contextstore = require('../helper/contextstore')
 
-exports.commandRegex = /\/context(\s*)(.*)/
+const commandRegex = /\/context(\s*)(.*)/
 
-exports.registerListener = function (bot) {
+function registerListener (bot) {
     bot.onText(commandRegex, (msg, match) => handleContext (bot, msg.chat.id, match[2]))
 }
 
-exports.isInCurrentContext = function (station) {
+function isInCurrentContext (station) {
     return contextstore.isInCurrentContext(station)
 }
 
@@ -28,7 +28,7 @@ function getAnswer(context) {
     }
 }
 
-exports.handleInline = function (bot, chatId) {
+function handleInline (bot, chatId) {
     const list = [
         {
             id: '0',
@@ -39,3 +39,10 @@ exports.handleInline = function (bot, chatId) {
     ]
     bot.answerInlineQuery(chatId, list);
 }
+
+module.exports = Object.freeze({
+    commandRegex,
+    registerListener,
+    isInCurrentContext,
+    handleInline
+});

@@ -1,14 +1,14 @@
 const planstore = require('../helper/planstore')
 
-exports.commandRegex = /\/plan/
+const commandRegex = /\/plan/
 
-exports.registerListener = function (bot) {
+function registerListener (bot) {
   bot.onText(commandRegex, msg => handleCommandPlan(bot, msg.chat.id))
 }
 
-exports.handleCommandPlan = function (bot, chatId) {
-  bot.sendMessage(msg.chat.id, 'Welchen Netzplan möchtest du haben?', getPlanSelection())
-  bot.once('callback_query', query => handlePlanSelection(bot, msg, query))
+function handleCommandPlan (bot, chatId) {
+  bot.sendMessage(chatId, 'Welchen Netzplan möchtest du haben?', getPlanSelection())
+  bot.once('callback_query', query => handlePlanSelection(bot, chatId, query))
 }
 
 function getPlanSelection() {
@@ -34,7 +34,7 @@ function handlePlanSelection(bot, chatId, query) {
   bot.sendDocument(chatId, planstore.getPlanPath(query.data), planstore.getPlanAsDocument(query.data))
 }
 
-exports.handleInline = function (bot, chatId) {
+function handleInline (bot, chatId) {
   const list = [
       {
           id: '0',
@@ -45,3 +45,9 @@ exports.handleInline = function (bot, chatId) {
   ]
   bot.answerInlineQuery(chatId, list);
 }
+
+module.exports = Object.freeze({
+  commandRegex,
+  registerListener,
+  handleInline
+});

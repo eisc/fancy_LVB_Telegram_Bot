@@ -1,6 +1,6 @@
-exports.commandRegex = /\/help/
+const commandRegex = /\/help/
 
-exports.registerListener = function (bot) {
+function registerListener (bot) {
     bot.onText(commandRegex, msg => handleCommandHelp (bot, msg.chat.id))
 }
 
@@ -20,7 +20,7 @@ function getHelpMessage() {
         + '• Mit /plan bekommst du den Liniennetzplan als PDF geschickt.\n'
 }
 
-exports.handleInline = function (bot, chatId) {
+function handleInline (bot, chatId) {
     const list = [
         {
             id: '0',
@@ -31,3 +31,9 @@ exports.handleInline = function (bot, chatId) {
     ]
     bot.answerInlineQuery(chatId, list);
 }
+
+module.exports = Object.freeze({
+    commandRegex,
+    registerListener,
+    handleInline
+});

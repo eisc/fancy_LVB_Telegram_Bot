@@ -1,12 +1,8 @@
-const commonStationHelper = require('./commonstations')
+const selectable = require('./selection/selectable')
 const globalStations = []
 
 exports.globalStationsLength = function () {
   return globalStations.length
-}
-
-exports.getMatchingGlobalStations = function (stationName) {
-  return commonStationHelper.getMatchingStations(globalStations, stationName)
 }
 
 exports.addGlobalStation = function (station) {
@@ -45,7 +41,7 @@ exports.removeKeyboard = removeKeyboard
 exports.globalStationsAsKeyboard = function () {
   return {
     reply_markup: {
-      keyboard: commonStationHelper.transformToSelectableStationNames(globalStations),
+      keyboard: selectable.transformToSelectableStationNames(globalStations),
       resize_keyboard: true
     }
   }

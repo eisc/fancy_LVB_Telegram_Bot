@@ -1,10 +1,10 @@
-const tableHelper = require('./departuretable')
+const table = require('./format/table')
 
-exports.handleDeparture = function (bot, msg, station, departureResults) {
+exports.handleDeparture = function (bot, chatId, station, departureResults) {
   if (departureResults.length) {
-    const departures = tableHelper.createAnswerForDepartureResult(departureResults)
+    const departures = table.createAnswerForDepartureResult(departureResults)
     if (departures.length === 0) {
-      bot.sendMessage(msg.chat.id, `Keine aktuellen Abfahrten für *${station.name}* gefunden.`,
+      bot.sendMessage(chatId, `Keine aktuellen Abfahrten für *${station.name}* gefunden.`,
         { parse_mode: 'Markdown' })
     } else {
       var sliceStart = 0
@@ -14,22 +14,22 @@ exports.handleDeparture = function (bot, msg, station, departureResults) {
   }
 }
 
-function sendDepartureMessage (bot, msg, station, departures, sliceMin, sliceSize) {
+function sendDepartureMessage (bot, chatId, station, departures, sliceMin, sliceSize) {
   const sliceMax = getSliceMax(departures, sliceMin, sliceSize)
   const answer = departures.slice(sliceMin, sliceMax)
-  const departTableStr = tableHelper.departureTable(station, answer)
-  bot.sendMessage(msg.chat.id, departTableStr, moreQuery(departures, sliceMax))
-  addCallbackHandler(bot, sliceMax, sliceSize, departures, station, msg)
+  const departTableStr = table.departureTable(station, answer)
+  bot.sendMessage(chatId, departTableStr, moreQuery(departures, sliceMax))
+  addCallbackHandler(bot, sliceMax, sliceSize, departures, station, chatId)
 }
 
-function addCallbackHandler (bot, sliceStart, sliceSize, departures, station, msg) {
+function addCallbackHandler (bot, sliceStart, sliceSize, departures, station, chatId) {
   if (departures.length <= sliceStart) {
     return
   }
   bot.once('callback_query', query => {
     bot.answerCallbackQuery(query.id)
     if (query.data === `more_departures_${sliceStart}`) {
-      sendDepartureMessage(bot, msg, station, departures, sliceStart, sliceSize)
+      sendDepartureMessage(bot, chatId, station, departures, sliceStart, sliceSize)
     }
   })
 }
