@@ -27,7 +27,7 @@ async function collectDeparturesForStations(stations) {
     const departures = []
     for(index = 0; index < stations.length; index++) {
         station = stations[index]
-        var foundDepartures = collectDeparturesForStation(station);
+        var foundDepartures = await collectDeparturesForStation(station);
         departures.push(foundDepartures);
     }
     return departures

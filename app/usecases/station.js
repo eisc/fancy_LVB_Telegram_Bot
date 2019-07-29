@@ -50,59 +50,41 @@ function handleMultipleMatchingStations(bot, chatId, stations) {
   });
 }
 
-function handleInline (bot, data) {
+async function handleInline (bot, data, contextResolver) {
   var content = data.query;
-  if (content.startsWith("/")) {
+  if (!content || content.length == 0 || content.startsWith("/")) {
       return;
   }
-  console.log(content);
-  const list = [
-      {
-          id: '0',
-          type: 'article',
-          title: 'Gerichtsweg',
-          message_text: 'Abfahrt Gerichtsweg'
-      },
-      {
-          id: '1',
-          type: 'article',
-          title: 'Münzgasse',
-          message_text: 'Abfahrt Münzgasse'
-      },
-      {
-          id: '2',
-          type: 'article',
-          title: 'Steinweg',
-          message_text: 'Abfahrt Steinweg'
-      }
-  ]
-  // examples:
-  // * https://github.com/yagop/node-telegram-bot-api/issues/557
-  // * https://github.com/yagop/node-telegram-bot-api/issues/729
-  // *
-
-  /*     interface InlineQueryResultBase {
-          id: string;
-          reply_markup?: InlineKeyboardMarkup;
-      }
-
-      interface InlineQueryResultArticle extends InlineQueryResultBase {
-          type: 'article';
-          title: string;
-          input_message_content: InputMessageContent;
-          url?: string;
-          hide_url?: boolean;
-          description?: string;
-          thumb_url?: string;
-          thumb_width?: number;
-          thumb_height?: number;
-      } */
-
-  // todos
-  // * take data.query string, fetch stations, display
+  const allStops = await gtfsStations.fetchAllStops()
+  const matchingStations = stationsMatcher.getMatchingStations(allStops, content, contextResolver)
+  const formattedStations = matchingStations.map(station => {
+    station.name = stationsNormalizer.normalizeStationName(station)
+    return station
+  })
+  const message = selection.getMessageForMatchingStations(formattedStations, content)
+  const list = []
+  if (message) {
+    list.push({
+      id: '0',
+      type: 'article',
+      title: message,
+      message_text: message
+    })
+  } else if (formattedStations.length > 0) {
+    const maxStations = formattedStations.length > 10 ? 10 : formattedStations.length
+    for (index = 0; index < maxStations; index++) {
+      const foundStation = formattedStations[index]
+      const departures = await departureCollector.collectDepartures(foundStation)
+      const result = departureQuery.handleDepartureInline(foundStation, departures)
+      list.push({
+        id: '' + index,
+        type: 'article',
+        title: 'Abfahrten ' + foundStation.name,
+        message_text: result
+      })
+    }
+  }
   bot.answerInlineQuery(data.id, list);
-  // to send message to bot directly
-  //bot.sendMessage(data.from.id, "hello world");
 }
 
 module.exports = Object.freeze({

@@ -14,6 +14,20 @@ exports.handleDeparture = function (bot, chatId, station, departureResults) {
   }
 }
 
+exports.handleDepartureInline = function (station, departureResults) {
+  if (departureResults.length) {
+    const departures = table.createAnswerForDepartureResult(departureResults)
+    if (departures.length === 0) {
+      return `Keine aktuellen Abfahrten für *${station.name}* gefunden.`
+    } else {
+      const sliceMax = getSliceMax(departures, 0, 10)
+      const answer = departures.slice(0, sliceMax)
+      return table.departureTable(station, answer)
+    }
+  }
+}
+
+
 function sendDepartureMessage (bot, chatId, station, departures, sliceMin, sliceSize) {
   const sliceMax = getSliceMax(departures, sliceMin, sliceSize)
   const answer = departures.slice(sliceMin, sliceMax)

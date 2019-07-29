@@ -19,4 +19,4 @@ const useCasesWithInlineSupport = [ startUseCase, helpUseCase,
 const bot = require('./helper/bot').createBot()
 useCases.forEach(useCase => useCase.registerListener(bot))
 useCasesWithContext.forEach(useCase => useCase.registerListener(bot, contextUseCase.isInCurrentContext))
-inlineUseCase.registerListener(bot, useCasesWithInlineSupport, stationUseCase)
+inlineUseCase.registerListener(bot, useCasesWithInlineSupport, stationUseCase, contextUseCase.isInCurrentContext)

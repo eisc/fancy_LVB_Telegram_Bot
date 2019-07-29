@@ -1,3 +1,4 @@
+const fetch = require('node-fetch')
 const moment = require('moment')
 const gtfs2lvb = require('../format/gtfs2lvb')
 

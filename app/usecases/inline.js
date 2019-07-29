@@ -1,4 +1,4 @@
-exports.registerListener = function (bot, useCasesWithInlineSupport, stationUseCase) {
+exports.registerListener = function (bot, useCasesWithInlineSupport, stationUseCase, contextResolver) {
     bot.on("inline_query", function (data) {
         for (index in useCasesWithInlineSupport) {
             const usecase = useCasesWithInlineSupport[index]
@@ -8,7 +8,7 @@ exports.registerListener = function (bot, useCasesWithInlineSupport, stationUseC
             }
         }
         if (stationUseCase.commandRegex.test(data.query)) {
-            usecase.handleInline(bot, data)
+            stationUseCase.handleInline(bot, data, contextResolver)
         }
     });
 }
