@@ -9,7 +9,7 @@ exports.handleDeparture = function (bot, chatId, station, departureResults) {
     } else {
       var sliceStart = 0
       const sliceSize = 10
-      sendDepartureMessage(bot, msg, station, departures, sliceStart, sliceSize)
+      sendDepartureMessage(bot, chatId, station, departures, sliceStart, sliceSize)
     }
   }
 }

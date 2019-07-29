@@ -1,11 +1,5 @@
 const moment = require('moment')
-const query = require('../query')
 const gtfs2lvb = require('../format/gtfs2lvb')
-
-exports.getDeparturesForStation = function (station) {
-  const departures = getGtfsDeparturesForStation(station.id)
-  query.handleDeparture(bot, msg, station, departures)
-}
 
 async function getGtfsDeparturesForStation (stopId) {
   const now = moment().format('YYYYMMDD')

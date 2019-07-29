@@ -3,9 +3,8 @@
 const gtfsStations = require('../helper/stations/gtfs')
 const stationsMatcher = require('../helper/stations/matcher')
 const stationsNormalizer = require('../helper/stations/normalizer')
-const lvbDeparure = require('../helper/departures/fetcher/lvb')
-const gtfsDeparture = require('../helper/departures/fetcher/gtfs')
-const query = require('../helper/departures/query')
+const departureCollector = require('../helper/departures/collector')
+const departureQuery = require('../helper/departures/query')
 const selection = require('../helper/stations/selection/selection')
 const selectable = require('../helper/stations/selection/selectable')
 
@@ -15,8 +14,8 @@ function registerListener (bot, contextResolver) {
   bot.onText(commandRegex, (msg, match) => handlePotentialStation(bot, msg.chat.id, match[0], contextResolver))
 }
 
-function handlePotentialStation (bot, chatId, station, contextResolver) {
-  const allStops = gtfsStations.fetchAllStops()
+async function handlePotentialStation (bot, chatId, station, contextResolver) {
+  const allStops = await gtfsStations.fetchAllStops()
   const matchingStations = stationsMatcher.getMatchingStations(allStops, station, contextResolver)
   const formattedStations = matchingStations.map(station => {
     station.name = stationsNormalizer.normalizeStationName(station)
@@ -25,89 +24,30 @@ function handlePotentialStation (bot, chatId, station, contextResolver) {
   handleMatchingStations(bot, chatId, formattedStations, station)
 }
 
-function handleMatchingStations (bot, chatId, stations, station) {
+async function handleMatchingStations (bot, chatId, stations, station) {
   const message = selection.getMessageForMatchingStations(stations, station)
   if (message) {
     bot.sendMessage(chatId, message)
   } else if (stations.length === 1) {
-    handleMatchingStation(bot, chatId, stations[0])
+    const foundStation = stations[0]
+    const departures = await departureCollector.collectDepartures(foundStation)
+    departureQuery.handleDeparture(bot, chatId, foundStation, departures)
   } else {
     handleMultipleMatchingStations(bot, chatId, stations);
   }
 }
 
 function handleMultipleMatchingStations(bot, chatId, stations) {
-  const selectableStationNames = selectable.transformToSelectableStationNames(stations);
-  bot.sendMessage(chatId,
-    `Meintest du eine dieser ${selectableStationNames.length} Haltestellen?`,
-    offerMatchingStationsForSelection(selectableStationNames));
-  bot.on('callback_query', query => {
+  const offer = selectable.offerMatchingStationsForSelection(stations);
+  bot.sendMessage(chatId, `Meintest du eine dieser ${stations.length} Haltestellen?`, offer);
+  bot.once('callback_query', query => {
     const station = stations.find(station => station.id === query.data);
     bot.answerCallbackQuery(query.id);
     if (station) {
-      handleMatchingStation(bot, chatId, station)
+      const departures = departureCollector.collectDepartures(station)
+      departureQuery.handleDeparture(bot, chatId, station, departures)
     }
   });
-}
-
-function offerMatchingStationsForSelection(stationNames) {
-  return {
-    reply_markup: {
-      inline_keyboard: stationNames
-    }
-  }
-}
-
-function handleMatchingStation (bot, msg, station) {
-  if(station.mappedStations && station.mappedStations.length > 0) {
-    handleMultipleMatchingStations(bot, msg, station)
-  } else {
-    handleSingleMatchingStation(bot, msg, station)
-  }
-}
-
-function handleSingleMatchingStation (bot, msg, station) {
-  if (station.name.includes(' ZUG')) {
-    gtfsDeparture.getDeparturesForStation(bot, msg, station)
-  } else {
-    lvbDeparure.getDeparturesForStation(bot, msg, station);
-  }
-}
-
-function handleMultipleMatchingStations (bot, msg, station) {
-  const calls = collectDepartureCalls(bot, msg, station.mappedStations)
-  Promise.all(calls).then(departureLists => {
-    const departures = flatMapDepartureLists (departureLists)
-    query.handleDeparture(bot, msg, station, departures)
-  }).catch(function(error) {
-    bot.sendMessage(msg.chat.id, 'Fehler ' + error.message)
-  })
-}
-
-function collectDepartureCalls (bot, msg, stations) {
-  const calls = []
-  stations.forEach(station => {
-    if (station.name.includes(' ZUG')) {
-      calls.push(gtfsDeparture.getDeparturesForStationPromise(bot, msg, station)
-        .catch(() => []))
-    } else {
-      calls.push(lvbDeparure.getDeparturesForStationPromise(station)
-        .catch(() => []))
-    }
-  })
-  return calls
-}
-
-function flatMapDepartureLists (departureLists) {
-  const departures = []
-  departureLists.forEach(departureList => {
-    departureList.forEach(departure => {
-      if (!departures.includes(departure)) {
-        departures.push(departure)
-      }
-    })
-  })
-  return departures
 }
 
 function handleInline (bot, data) {
@@ -168,6 +108,5 @@ function handleInline (bot, data) {
 module.exports = Object.freeze({
   commandRegex,
   registerListener,
-  handleMatchingStation,
   handleInline
 });

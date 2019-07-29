@@ -33,10 +33,8 @@ function handleMatchingStations (bot, chatId, stations, station) {
 }
 
 function handleMultipleMatchingStations(bot, chatId, stations) {
-  const selectableStationNames = selectable.transformToSelectableStationNames(stations);
-  bot.sendMessage(chatId,
-    `Meintest du eine dieser ${selectableStationNames.length} Haltestellen?`,
-    offerMatchingStationsForSelection(selectableStationNames));
+  const offer = selectable.offerMatchingStationsForSelection(stations);
+  bot.sendMessage(chatId, `Meintest du eine dieser ${stations.length} Haltestellen?`, offer);
   bot.on('callback_query', query => {
     const station = stations.find(station => station.id === query.data);
     bot.answerCallbackQuery(query.id);
@@ -44,14 +42,6 @@ function handleMultipleMatchingStations(bot, chatId, stations) {
       handleMatchingStation(bot, chatId, station)
     }
   });
-}
-
-function offerMatchingStationsForSelection(stationNames) {
-  return {
-    reply_markup: {
-      inline_keyboard: stationNames
-    }
-  }
 }
 
 function handleDeleteCompleteListRequest(bot, chatId) {

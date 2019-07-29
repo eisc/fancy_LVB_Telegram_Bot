@@ -1,4 +1,13 @@
-exports.transformToSelectableStationNames = function (stations) {
+function offerMatchingStationsForSelection (stations) {
+  const stationNames = transformToSelectableStationNames (stations)
+  return {
+    reply_markup: {
+      inline_keyboard: stationNames
+    }
+  }
+}
+
+function transformToSelectableStationNames (stations) {
   if(stations.length === 0) {
     return [[]]
   }
@@ -6,3 +15,8 @@ exports.transformToSelectableStationNames = function (stations) {
     return [{ text: station.name, callback_data: station.id }];
   });
 }
+
+module.exports = Object.freeze({
+  offerMatchingStationsForSelection,
+  transformToSelectableStationNames
+});

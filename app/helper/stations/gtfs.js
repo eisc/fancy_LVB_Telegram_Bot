@@ -9,7 +9,7 @@ exports.fetchAllStops = async function() {
     return stops;
   }
   const result = await fetch('https://gtfs.leipzig.codefor.de/otp/routers/default/index/stops')
-  const retrievedStops = result.json()
+  const retrievedStops = await result.json()
   gtfsCache.set(stopKey, retrievedStops)
   return retrievedStops
 }
