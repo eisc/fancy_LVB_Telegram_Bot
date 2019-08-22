@@ -20,7 +20,8 @@ function handleCommandLocation(bot, msg) {
   bot.once('callback_query', query => {
     const station = allStops.find(station => station.id === query.data)
     bot.answerCallbackQuery(query.id)
-    const departures = departureCollector.collectDepartures(station)
-    departureQuery.handleDeparture(bot, msg.chat.id, station, departures)
+    departureCollector.collectDepartures(station).then(
+      departures => departureQuery.handleDeparture(bot, msg.chat.id, station, departures) 
+    );
   })
 }

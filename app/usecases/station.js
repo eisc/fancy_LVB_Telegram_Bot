@@ -44,8 +44,9 @@ function handleMultipleMatchingStations(bot, chatId, stations) {
     const station = stations.find(station => station.id === query.data);
     bot.answerCallbackQuery(query.id);
     if (station) {
-      const departures = departureCollector.collectDepartures(station)
-      departureQuery.handleDeparture(bot, chatId, station, departures)
+      departureCollector.collectDepartures(station).then(
+        departures => departureQuery.handleDeparture(bot, chatId, station, departures)
+      );
     }
   });
 }

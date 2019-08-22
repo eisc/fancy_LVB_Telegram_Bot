@@ -1,3 +1,5 @@
+const moment = require('moment');
+
 exports.transformToLvbLayout = function (retrievedDepartures) {
   return retrievedDepartures.map(dep => {
     const timeTableList = []
