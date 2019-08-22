@@ -76,13 +76,15 @@ async function handleInline (bot, data, contextResolver) {
     for (index = 0; index < maxStations; index++) {
       const foundStation = formattedStations[index]
       const departures = await departureCollector.collectDepartures(foundStation)
-      const result = departureQuery.handleDepartureInline(foundStation, departures)
-      list.push({
-        id: '' + index,
-        type: 'article',
-        title: 'Abfahrten ' + foundStation.name,
-        message_text: result
-      })
+      const result = await departureQuery.handleDepartureInline(foundStation, departures)
+      if (result) {
+        list.push({
+          id: '' + index,
+          type: 'article',
+          title: 'Abfahrten ' + foundStation.name,
+          message_text: result
+        })  
+      }
     }
   }
   bot.answerInlineQuery(data.id, list);
