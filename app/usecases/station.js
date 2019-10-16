@@ -68,6 +68,7 @@ async function handleInline (bot, data, contextResolver) {
     list.push({
       id: '0',
       type: 'article',
+      parse_mode: 'Markdown',
       title: message,
       message_text: message
     })
@@ -81,6 +82,7 @@ async function handleInline (bot, data, contextResolver) {
         list.push({
           id: '' + index,
           type: 'article',
+          parse_mode: 'Markdown',
           title: 'Abfahrten ' + foundStation.name,
           message_text: result
         })  
