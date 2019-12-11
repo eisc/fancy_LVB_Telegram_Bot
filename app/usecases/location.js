@@ -9,8 +9,8 @@ exports.registerListener = function (bot) {
   bot.on('location', msg => handleCommandLocation(bot, msg))
 }
 
-function handleCommandLocation(bot, msg) {
-  const allStops = gtfsStations.fetchAllStops();
+async function handleCommandLocation(bot, msg) {
+  const allStops = await gtfsStations.fetchAllStops();
   const stationNames = nearest.getNearestStationsForSelection(allStops, msg.location, MAX_NEAREST_STATIONS)
   bot.sendMessage(msg.chat.id, `Danke. Das sind die nächsten ${MAX_NEAREST_STATIONS} Haltestellen:`, {
     reply_markup: {
