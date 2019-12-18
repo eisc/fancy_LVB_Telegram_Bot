@@ -16,8 +16,10 @@ function getHelpMessage() {
         + '• Mit /reset kannst du die Kurzwahlliste löschen. Gibst du den Namen einer '
         + 'Haltestelle ein, dann löscht es nur diese aus der Liste.\n'
         + '• Sende mir deinen Standort ich zeige dir die 5 nächstgelegenen Haltestellen.\n'
-        + '• Mit /station kannst du dir den Standort einer Haltestelle anzeigen lassen.\n'
+        + '• Mit location kannst du dir den Standort einer Haltestelle anzeigen lassen.\n'
         + '• Mit /plan bekommst du den Liniennetzplan als PDF geschickt.\n'
+        + '• Mit /context Leipzig kannst Du den Abfragebereich auf Leipzig einschränken'
+        + 'mit /context MDV wird wieder der gesamte Verkehrsverbund abgefragt \n'
 }
 
 function handleInline (bot, chatId) {

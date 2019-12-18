@@ -85,7 +85,7 @@ async function handleInline (bot, data, contextResolver) {
           parse_mode: 'Markdown',
           title: 'Abfahrten ' + foundStation.name,
           message_text: result
-        })  
+        })
       }
     }
   }
