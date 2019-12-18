@@ -20,3 +20,8 @@ const bot = require('./helper/bot').createBot()
 useCases.forEach(useCase => useCase.registerListener(bot))
 useCasesWithContext.forEach(useCase => useCase.registerListener(bot, contextUseCase.isInCurrentContext))
 inlineUseCase.registerListener(bot, useCasesWithInlineSupport, stationUseCase, contextUseCase.isInCurrentContext)
+
+bot.on('callback_query', query => {
+    useCases.filter(useCase => useCase.canHandleCallback && useCase.canHandleCallback(query))
+        .forEach(useCase => useCase.handleCallback(bot, query.from.id, query))
+})

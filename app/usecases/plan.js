@@ -8,7 +8,6 @@ function registerListener (bot) {
 
 function handleCommandPlan (bot, chatId) {
   bot.sendMessage(chatId, 'Welchen Netzplan möchtest du haben?', getPlanSelection())
-  bot.once('callback_query', query => handlePlanSelection(bot, chatId, query))
 }
 
 function getPlanSelection() {
@@ -16,22 +15,37 @@ function getPlanSelection() {
     reply_markup: {
       inline_keyboard: [
         [
-          { text: 'Gesamtnetz Leipzig', callback_data: '0' },
-          { text: 'Liniennetz Nacht', callback_data: '1' }
+          { text: 'Gesamtnetz Leipzig', callback_data: getPlanSelectionPayload('0') },
+          { text: 'Liniennetz Nacht', callback_data: getPlanSelectionPayload('1') }
         ],
         [
-          { text: 'Stadtplan Leipzig', callback_data: '2' },
-          { text: 'Tarifzonenplan MDV', callback_data: '3' }
+          { text: 'Stadtplan Leipzig', callback_data: getPlanSelectionPayload('2') },
+          { text: 'Tarifzonenplan MDV', callback_data: getPlanSelectionPayload('3') }
         ]
       ]
     }
   }
 }
 
-function handlePlanSelection(bot, chatId, query) {
-  bot.answerCallbackQuery(query.id)
-  bot.sendChatAction(chatId, 'upload_document')
-  bot.sendDocument(chatId, planstore.getPlanPath(query.data), planstore.getPlanAsDocument(query.data))
+function getPlanSelectionPayload (selectionIndex) {
+  return JSON.stringify({
+    planSelection: selectionIndex
+  }, null, 2)
+}
+
+function canHandleCallback(query) {
+  const payload = query.data && JSON.parse(query.data)
+  return payload && payload.planSelection
+}
+
+function handleCallback(bot, chatId, query) {
+  const planSelection = canHandleCallback(query)
+  if (planSelection) {
+    bot.answerCallbackQuery(query.id)
+    bot.sendChatAction(chatId, 'upload_document')
+    bot.sendDocument(chatId, planstore.getPlanPath(planSelection),
+      planstore.getPlanAsDocument(planSelection))
+  }
 }
 
 function handleInline (bot, chatId) {
@@ -49,5 +63,7 @@ function handleInline (bot, chatId) {
 module.exports = Object.freeze({
   commandRegex,
   registerListener,
-  handleInline
+  handleInline,
+  canHandleCallback,
+  handleCallback
 });
