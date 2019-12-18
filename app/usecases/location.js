@@ -5,7 +5,7 @@ const departureQuery = require('../helper/departures/query')
 
 const MAX_NEAREST_STATIONS = 5;
 
-exports.registerListener = function (bot) {
+function registerListener(bot) {
   bot.on('location', msg => handleCommandLocation(bot, msg))
 }
 
@@ -17,11 +17,26 @@ async function handleCommandLocation(bot, msg) {
       inline_keyboard: stationNames
     }
   })
-  bot.once('callback_query', query => {
-    const station = allStops.find(station => station.id === query.data)
+}
+
+function canHandleCallback(query) {
+  const payload = query.data && JSON.parse(query.data)
+  return payload && payload.stationFromLocationSelection
+}
+
+function handleCallback(bot, chatId, query) {
+  const stationId = canHandleCallback(query)
+  if (stationId) {
+    const station = allStops.find(station => station.id === stationId)
     bot.answerCallbackQuery(query.id)
     departureCollector.collectDepartures(station).then(
-      departures => departureQuery.handleDeparture(bot, msg.chat.id, station, departures) 
+      departures => departureQuery.handleDeparture(bot, msg.chat.id, station, departures)
     );
-  })
+  }
 }
+
+module.exports = Object.freeze({
+  registerListener,
+  canHandleCallback,
+  handleCallback
+});
