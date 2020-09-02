@@ -17,7 +17,7 @@ exports.getDeparturesForStation = function (bot, msg, station) {
 
 function getDeparturesForStationPromise (bot, msg, station) {
   try {
-    return gtfsHelper.fetchDeparture(bot, msg, station.id)
+    return gtfsHelper.fetchDeparture(bot, msg, station)
   } catch(error) {
     bot.sendMessage(msg.chat.id, 'Fehler ' + error.message)
   }
