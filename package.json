@@ -12,7 +12,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "lodash": "^4.17.13",
+    "lodash": "^4.17.19",
     "lodash.isobject": "^3.0.2",
     "lvb": "1.0.4",
     "moment": "^2.22.2",
