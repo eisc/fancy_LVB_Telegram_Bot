@@ -17,7 +17,7 @@
     "lvb": "1.0.4",
     "moment": "^2.22.2",
     "node-cache": "^4.2.0",
-    "node-fetch": "^2.3.0",
+    "node-fetch": "^2.6.1",
     "node-telegram-bot-api": "^0.30.0"
   },
   "devDependencies": {
