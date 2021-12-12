@@ -29,7 +29,11 @@ function handleSingleMatchingStation (bot, msg, station) {
   if (station.name.includes(' ZUG')) {
     departureGtfsHelper.getDeparturesForStation(bot, msg, station)
   } else {
-    departureLvbHelper.getDeparturesForStation(bot, msg, station);
+    /*try {
+      departureLvbHelper.getDeparturesForStation(bot, msg, station);
+    } catch (e) {*/
+      departureGtfsHelper.getDeparturesForStation(bot, msg, station)
+    //}
   }
 }
 
