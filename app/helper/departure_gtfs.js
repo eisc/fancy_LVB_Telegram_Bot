@@ -7,7 +7,7 @@ exports.getDeparturesForStation = function (bot, msg, station) {
       departures => {
         departureHelper.handleDeparture(bot, msg, station, departures)
       }
-    ).catch(function(error) { 
+    ).catch(function(error) {
       bot.sendMessage(msg.chat.id, 'Fehler ' + error.message)
     })
   } catch(error) {

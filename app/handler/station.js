@@ -1,7 +1,6 @@
 const gtfsHelper = require('../helper/gtfs')
 const stationsHelper = require('../helper/stations')
-const departureLvbHelper = require('../helper/departure_lvb')
-const departureGtfsHelper = require('../helper/departure_gtfs')
+const departureHafasHelper = require('../helper/departure_hafas')
 const departureHelper = require('../helper/departure')
 const commonStationsHelper = require('../helper/commonstations')
 
@@ -26,15 +25,7 @@ function handleMatchingStation (bot, msg, station) {
 exports.handleMatchingStation = handleMatchingStation
 
 function handleSingleMatchingStation (bot, msg, station) {
-  if (station.name.includes(' ZUG')) {
-    departureGtfsHelper.getDeparturesForStation(bot, msg, station)
-  } else {
-    /*try {
-      departureLvbHelper.getDeparturesForStation(bot, msg, station);
-    } catch (e) {*/
-      departureGtfsHelper.getDeparturesForStation(bot, msg, station)
-    //}
-  }
+  departureHafasHelper.getDeparturesForStation(bot, msg, station)
 }
 
 function handleMultipleMatchingStations (bot, msg, station) {
@@ -42,7 +33,7 @@ function handleMultipleMatchingStations (bot, msg, station) {
   Promise.all(calls).then(departureLists => {
     const departures = flatMapDepartureLists (departureLists)
     departureHelper.handleDeparture(bot, msg, station, departures)
-  }).catch(function(error) { 
+  }).catch(function(error) {
     bot.sendMessage(msg.chat.id, 'Fehler ' + error.message)
   })
 }
@@ -50,13 +41,8 @@ function handleMultipleMatchingStations (bot, msg, station) {
 function collectDepartureCalls (bot, msg, stations) {
   const calls = []
   stations.forEach(station => {
-    if (station.name.includes(' ZUG')) {
-      calls.push(departureGtfsHelper.getDeparturesForStationPromise(bot, msg, station)
-        .catch(() => []))
-    } else {
-      calls.push(departureLvbHelper.getDeparturesForStationPromise(station)
-        .catch(() => []))
-    }
+    calls.push(departureHafasHelper.getDeparturesForStationPromise(station)
+      .catch(() => []))
   })
   return calls
 }

@@ -4,13 +4,16 @@ const gtfsCache = new NodeCache();
 const stopKey = "stops"
 const moment = require('moment')
 
+const gtfsUrl = 'http://h2932118.stratoserver.net:8087';
+//const gtfsUrl = 'https://gtfs.codeforleipzig.de';
+
 exports.fetchAllStops = function(bot, msg) {
   const stops = gtfsCache.get(stopKey)
   if(stops) {
     return Promise.resolve(stops);
   }
   try {
-    return fetch('https://gtfs.codeforleipzig.de/otp/routers/default/index/stops').then(
+    return fetch(`${gtfsUrl}/otp/routers/default/index/stops`).then(
       result => {
         const retrievedStops = result.json()
         gtfsCache.set(stopKey, retrievedStops)
@@ -26,7 +29,7 @@ exports.fetchAllStops = function(bot, msg) {
 exports.fetchDeparture = function(bot, msg, stopId) {
   try {
     const now = moment().format('YYYYMMDD')
-    return fetch(`https://gtfs.codeforleipzig.de/otp/routers/default/index/stops/${stopId}/stoptimes/${now}`).then(response => {
+    return fetch(`${gtfsUrl}//otp/routers/default/index/stops/${stopId}/stoptimes/${now}`).then(response => {
       return response.text()
     }).then(result => {
         const retrievedDepartures = JSON.parse(result)
